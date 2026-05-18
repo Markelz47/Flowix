@@ -58,7 +58,7 @@ exports.handler = async function(event) {
             resolve({
               statusCode: 200,
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ text: parsed.content[0].text })
+              body: JSON.stringify({ text: parsed.content && parsed.content[0] ? parsed.content[0].text : 'Sin contenido: ' + JSON.stringify(parsed) })
             });
           }
         } catch(e) {
