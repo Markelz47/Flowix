@@ -65,7 +65,7 @@ exports.handler = async function(event) {
           resolve({
             statusCode: 500,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: 'Error procesando respuesta' })
+            body: JSON.stringify({ error: 'Error procesando: ' + data })
           });
         }
       });
