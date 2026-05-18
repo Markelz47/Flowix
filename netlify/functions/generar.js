@@ -9,8 +9,9 @@ exports.handler = async function(event) {
 
   if (!ANTHROPIC_API_KEY) {
     return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'API key no configurada' })
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: 'ERROR: API key no configurada' })
     };
   }
 
@@ -18,14 +19,18 @@ exports.handler = async function(event) {
   try {
     body = JSON.parse(event.body);
   } catch(e) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Body inválido' }) };
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: 'ERROR: Body invalido - ' + e.message })
+    };
   }
 
   const { prompt } = body;
 
   const postData = JSON.stringify({
     model: 'claude-sonnet-4-5',
-    max_tokens: 2500,
+    max_tokens: 1000,
     messages: [{ role: 'user', content: prompt }]
   });
 
@@ -46,36 +51,19 @@ exports.handler = async function(event) {
       let data = '';
       res.on('data', (chunk) => { data += chunk; });
       res.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          if (res.statusCode !== 200) {
-            resolve({
-              statusCode: res.statusCode,
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ error: JSON.stringify(parsed) })
-            });
-          } else {
-            resolve({
-              statusCode: 200,
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ text: parsed.content && parsed.content[0] ? parsed.content[0].text : 'Sin contenido: ' + JSON.stringify(parsed) })
-            });
-          }
-        } catch(e) {
-          resolve({
-            statusCode: 500,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: 'Error procesando: ' + data })
-          });
-        }
+        resolve({
+          statusCode: 200,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: 'RESPUESTA ANTHROPIC: ' + data })
+        });
       });
     });
 
     req.on('error', (e) => {
       resolve({
-        statusCode: 500,
+        statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: e.message })
+        body: JSON.stringify({ text: 'ERROR RED: ' + e.message })
       });
     });
 
