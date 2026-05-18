@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowix — Mi Metodología</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#00C896;--gd:#008F6B;--gx:rgba(0,200,150,0.1);--gb:rgba(0,200,150,0.18);
+  --b:#0EA5E9;--bx:rgba(14,165,233,0.1);--bb:rgba(14,165,233,0.18);
+  --bg:#05080B;--bg2:#080D12;--s1:#0C1520;--s2:#101C28;--s3:#152030;
+  --t1:#EDF2F8;--t2:#7A94AE;--t3:#415A72;--bd:rgba(255,255,255,0.055);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;font-size:14px}
+
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:rgba(5,8,11,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--g);letter-spacing:-.5px;text-decoration:none}
+.logo em{color:var(--b);font-style:normal}
+.nav-back{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--t2);text-decoration:none;background:var(--s1);border:1px solid var(--bd);padding:8px 16px;border-radius:50px;transition:color .2s}
+.nav-back:hover{color:var(--t1)}
+
+.wrap{max-width:900px;margin:0 auto;padding:40px 24px 80px}
+.page-header{margin-bottom:40px}
+.page-header h1{font-family:'Syne',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:-1px;margin-bottom:8px}
+.page-header h1 span{background:linear-gradient(135deg,var(--g),var(--b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.page-header p{font-size:15px;color:var(--t3);font-weight:300;max-width:600px;line-height:1.6}
+
+.section{background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:28px;margin-bottom:20px}
+.section-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;color:var(--t1)}
+.section-title .ic{font-size:18px}
+.section-title .badge{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--g);background:var(--gx);border:1px solid var(--gb);padding:3px 10px;border-radius:50px}
+
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field.full{grid-column:1/-1}
+label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3)}
+input,select,textarea{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:11px 14px;font-size:14px;color:var(--t1);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--gb)}
+input::placeholder,textarea::placeholder{color:var(--t3)}
+select option{background:var(--s2)}
+textarea{resize:vertical;line-height:1.6}
+
+.tl{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin:16px 0 8px}
+.tags{display:flex;flex-wrap:wrap;gap:7px}
+.tag{padding:6px 14px;border-radius:50px;font-size:13px;cursor:pointer;border:1px solid var(--bd);background:var(--s2);color:var(--t2);transition:all .18s;user-select:none}
+.tag.on{background:var(--gx);border-color:var(--gb);color:var(--g)}
+.tag.bon.on{background:var(--bx);border-color:var(--bb);color:var(--b)}
+
+.div{height:1px;background:var(--bd);margin:20px 0}
+
+.info-box{background:var(--gx);border:1px solid var(--gb);border-radius:12px;padding:14px 18px;font-size:13px;color:var(--g);margin-bottom:20px;line-height:1.6}
+
+.save-btn{width:100%;padding:16px;border-radius:14px;font-size:16px;font-weight:700;font-family:'Syne',sans-serif;background:linear-gradient(135deg,var(--gd),var(--g));color:var(--bg);border:none;cursor:pointer;box-shadow:0 0 40px rgba(0,200,150,0.2);transition:all .3s;margin-top:8px}
+.save-btn:hover{transform:translateY(-2px);box-shadow:0 0 60px rgba(0,200,150,0.35)}
+
+.saved-msg{display:none;text-align:center;padding:16px;font-size:14px;font-weight:600;color:var(--g);background:var(--gx);border:1px solid var(--gb);border-radius:12px;margin-top:14px}
+.saved-msg.show{display:block;animation:fadeup .4s ease}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:640px){nav{padding:14px 16px}.wrap{padding:24px 16px 60px}.section{padding:20px 16px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">Flow<em>ix</em></a>
+  <a class="nav-back" href="flowix_dashboard.html">← Dashboard</a>
+</nav>
+
+<div class="wrap">
+  <div class="page-header">
+    <h1>Mi <span>metodología</span></h1>
+    <p>Configura tu forma de entrenar una sola vez. Flowix la aplicará en cada rutina que generes — como si la hubieras diseñado tú mismo.</p>
+  </div>
+
+  <div class="info-box">
+    ✦ Esta es la sección más importante de Flowix. Cuanto más detalle añadas, más personalizadas serán las rutinas que generes para tus clientes.
+  </div>
+
+  <!-- SISTEMA DE REPETICIONES -->
+  <div class="section">
+    <div class="section-title"><span class="ic">🎯</span>Sistema de repeticiones y esfuerzo</div>
+    <div class="tl">Método principal</div>
+    <div class="tags" id="t-metodo">
+      <div class="tag" onclick="sel(this,'metodo')">RIR (Reps en Reserva)</div>
+      <div class="tag" onclick="sel(this,'metodo')">RPE (Esfuerzo Percibido)</div>
+      <div class="tag" onclick="sel(this,'metodo')">Series y reps clásicas</div>
+      <div class="tag" onclick="sel(this,'metodo')">Al fallo controlado</div>
+    </div>
+    <div class="div"></div>
+    <div class="g3">
+      <div class="field">
+        <label>RIR en multiarticulares</label>
+        <select id="rir-multi">
+          <option value="">Seleccionar...</option>
+          <option>RIR 3 (muy conservador)</option>
+          <option>RIR 2</option>
+          <option>RIR 1</option>
+          <option>RIR 0 (al fallo)</option>
+          <option>Varía según semana</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>RIR en aislamientos</label>
+        <select id="rir-aisle">
+          <option value="">Seleccionar...</option>
+          <option>RIR 2</option>
+          <option>RIR 1</option>
+          <option>RIR 0 (al fallo)</option>
+          <option>Siempre al fallo</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tempo habitual</label>
+        <select id="tempo">
+          <option value="">Seleccionar...</option>
+          <option>Explosivo (sin tempo)</option>
+          <option>Controlado 2-0-2</option>
+          <option>Excéntrico lento 3-0-1</option>
+          <option>Con isométrico 2-1-2</option>
+        </select>
+      </div>
+    </div>
+    <div class="field full" style="margin-top:14px">
+      <label>Describe tu sistema en detalle</label>
+      <textarea id="sistema-detalle" placeholder="Ej: Primera serie pesada RIR 2, segunda serie bajada de peso a RIR 1, tercera serie otra bajada a RIR 0 sin fallar. Nunca al fallo en sentadilla ni peso muerto, sí en curl de bíceps y extensiones..." style="min-height:90px"></textarea>
+    </div>
+  </div>
+
+  <!-- ESTRUCTURA DE SESIÓN -->
+  <div class="section">
+    <div class="section-title"><span class="ic">📋</span>Estructura de la sesión</div>
+    <div class="g3">
+      <div class="field">
+        <label>Distribución preferida</label>
+        <select id="split">
+          <option value="">Seleccionar...</option>
+          <option>Torso / Pierna</option>
+          <option>Push / Pull / Legs</option>
+          <option>Fullbody</option>
+          <option>Por grupos musculares</option>
+          <option>Según disponibilidad cliente</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Ejercicios por sesión</label>
+        <select id="ejercicios-sesion">
+          <option value="">Seleccionar...</option>
+          <option>4-5 ejercicios</option>
+          <option>5-6 ejercicios</option>
+          <option>6-8 ejercicios</option>
+          <option>Según duración disponible</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Descanso entre series</label>
+        <select id="descanso">
+          <option value="">Seleccionar...</option>
+          <option>60-90 segundos</option>
+          <option>90-120 segundos</option>
+          <option>2-3 minutos</option>
+          <option>3-5 minutos en básicos</option>
+          <option>Según intensidad</option>
+        </select>
+      </div>
+    </div>
+    <div class="tl">Orden de ejercicios</div>
+    <div class="tags" id="t-orden">
+      <div class="tag" onclick="sel(this,'orden')">Más demandante primero</div>
+      <div class="tag" onclick="sel(this,'orden')">Prioridad al grupo débil primero</div>
+      <div class="tag" onclick="sel(this,'orden')">Compuestos → aislamientos</div>
+      <div class="tag" onclick="sel(this,'orden')">Según objetivo del día</div>
+    </div>
+    <div class="field full" style="margin-top:14px">
+      <label>¿Incluyes calentamiento específico?</label>
+      <textarea id="calentamiento" placeholder="Ej: 2 series de activación con el 50% del peso de trabajo antes de cada ejercicio principal. Movilidad articular al inicio de cada sesión..." style="min-height:70px"></textarea>
+    </div>
+    <div class="div"></div>
+    <div class="tl">Cardio</div>
+    <div class="tags" id="t-cardio">
+      <div class="tag bon" onclick="tog(this)">No incluyo cardio</div>
+      <div class="tag bon" onclick="tog(this)">Cardio post-sesión</div>
+      <div class="tag bon" onclick="tog(this)">Cardio en días separados</div>
+      <div class="tag bon" onclick="tog(this)">LISS en déficit</div>
+      <div class="tag bon" onclick="tog(this)">HIIT ocasional</div>
+    </div>
+  </div>
+
+  <!-- PROGRESIÓN -->
+  <div class="section">
+    <div class="section-title"><span class="ic">📈</span>Progresión y periodización</div>
+    <div class="tl">Tipo de progresión</div>
+    <div class="tags" id="t-progresion">
+      <div class="tag" onclick="sel(this,'progresion')">Doble progresión</div>
+      <div class="tag" onclick="sel(this,'progresion')">Progresión lineal</div>
+      <div class="tag" onclick="sel(this,'progresion')">Progresión ondulada</div>
+      <div class="tag" onclick="sel(this,'progresion')">Por bloques / mesociclos</div>
+    </div>
+    <div class="div"></div>
+    <div class="g3">
+      <div class="field">
+        <label>Duración del mesociclo</label>
+        <select id="mesociclo">
+          <option value="">Seleccionar...</option>
+          <option>4 semanas</option>
+          <option>6 semanas</option>
+          <option>8 semanas</option>
+          <option>12 semanas</option>
+          <option>Según cliente</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Semana de descarga</label>
+        <select id="descarga">
+          <option value="">Seleccionar...</option>
+          <option>Cada 4 semanas</option>
+          <option>Cada 6 semanas</option>
+          <option>Cada 8 semanas</option>
+          <option>Según señales del cliente</option>
+          <option>No programo descargas</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tipo de descarga</label>
+        <select id="tipo-descarga">
+          <option value="">Seleccionar...</option>
+          <option>Activa (reducción volumen)</option>
+          <option>Activa (reducción intensidad)</option>
+          <option>Completa (descanso total)</option>
+          <option>Según cómo llega el cliente</option>
+        </select>
+      </div>
+    </div>
+    <div class="field full" style="margin-top:14px">
+      <label>¿Cómo progresas el volumen semana a semana?</label>
+      <textarea id="progresion-detalle" placeholder="Ej: Semana 1: volumen base. Semana 2: +1 serie en ejercicios principales. Semana 3: +1 serie más o subida de peso. Semana 4: descarga al 60% del volumen..." style="min-height:80px"></textarea>
+    </div>
+  </div>
+
+  <!-- TÉCNICAS DE ALTA INTENSIDAD -->
+  <div class="section">
+    <div class="section-title"><span class="ic">⚡</span>Técnicas de alta intensidad</div>
+    <div class="tl">Técnicas que usas (selecciona todas las que apliques)</div>
+    <div class="tags" id="t-tecnicas">
+      <div class="tag bon" onclick="tog(this)">Drop sets</div>
+      <div class="tag bon" onclick="tog(this)">Rest-pause</div>
+      <div class="tag bon" onclick="tog(this)">Myo-reps</div>
+      <div class="tag bon" onclick="tog(this)">Superseries antagonistas</div>
+      <div class="tag bon" onclick="tog(this)">Superseries compuestas</div>
+      <div class="tag bon" onclick="tog(this)">Series descendentes</div>
+      <div class="tag bon" onclick="tog(this)">Giant sets</div>
+      <div class="tag bon" onclick="tog(this)">No uso alta intensidad</div>
+    </div>
+    <div class="field full" style="margin-top:14px">
+      <label>¿Cuándo y cómo las aplicas?</label>
+      <textarea id="tecnicas-detalle" placeholder="Ej: Drop sets solo en aislamientos, siempre en la última serie. Rest-pause en curl de bíceps y extensiones de tríceps. Nunca técnicas de alta intensidad en sentadilla, peso muerto o press..." style="min-height:80px"></textarea>
+    </div>
+  </div>
+
+  <!-- EJERCICIOS BASE -->
+  <div class="section">
+    <div class="section-title"><span class="ic">🏋️</span>Ejercicios base y preferencias</div>
+    <div class="g2">
+      <div class="field">
+        <label>Ejercicios que siempre incluyes</label>
+        <textarea id="ejercicios-siempre" placeholder="Ej: Sentadilla goblet, press banca, jalón polea, hip thrust, remo con mancuerna..." style="min-height:90px"></textarea>
+      </div>
+      <div class="field">
+        <label>Ejercicios que nunca usas</label>
+        <textarea id="ejercicios-nunca" placeholder="Ej: Fondos en paralelas, press militar con barra detrás de la nuca, encogimientos con barra..." style="min-height:90px"></textarea>
+      </div>
+      <div class="field">
+        <label>Preferencia: máquinas vs peso libre</label>
+        <select id="maquinas-vs-libre">
+          <option value="">Seleccionar...</option>
+          <option>Priorizo peso libre siempre</option>
+          <option>Combino según el ejercicio</option>
+          <option>Priorizo máquinas en aislamientos</option>
+          <option>Según el equipamiento del cliente</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Posición del ejercicio en la sesión</label>
+        <select id="posicion">
+          <option value="">Seleccionar...</option>
+          <option>Compuestos al inicio siempre</option>
+          <option>Prioridad al grupo débil primero</option>
+          <option>Flexibilidad según objetivo del día</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMUNICACIÓN -->
+  <div class="section">
+    <div class="section-title"><span class="ic">💬</span>Tono y comunicación con el cliente</div>
+    <div class="g2">
+      <div class="field">
+        <label>Tono en las rutinas</label>
+        <select id="tono-rutinas">
+          <option value="">Seleccionar...</option>
+          <option>Técnico y detallado</option>
+          <option>Cercano y motivador</option>
+          <option>Simple y directo</option>
+          <option>Muy explicativo (principiantes)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Nivel de detalle en instrucciones</label>
+        <select id="detalle-instrucciones">
+          <option value="">Seleccionar...</option>
+          <option>Mínimo — solo series y reps</option>
+          <option>Medio — con notas clave</option>
+          <option>Alto — explicación técnica completa</option>
+        </select>
+      </div>
+    </div>
+    <div class="field full" style="margin-top:14px">
+      <label>Notas adicionales sobre tu estilo</label>
+      <textarea id="notas-estilo" placeholder="Cualquier detalle de tu metodología que no hayas podido expresar arriba. Cuanto más específico, mejor generará Flowix tus rutinas..." style="min-height:80px"></textarea>
+    </div>
+  </div>
+
+  <button class="save-btn" onclick="guardar()">✓ Guardar metodología</button>
+  <div class="saved-msg" id="savedMsg">✅ Metodología guardada correctamente. Flowix la aplicará en todas tus rutinas.</div>
+</div>
+
+<script>
+const sm = {};
+function sel(el, g) {
+  el.closest('.tags').querySelectorAll('.tag').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  sm[g] = el.textContent.trim();
+}
+function tog(el) { el.classList.toggle('on'); }
+
+function guardar() {
+  const btn = document.querySelector('.save-btn');
+  btn.textContent = '✓ Guardando...';
+  btn.disabled = true;
+  setTimeout(() => {
+    document.getElementById('savedMsg').classList.add('show');
+    btn.textContent = '✓ Guardar metodología';
+    btn.disabled = false;
+    setTimeout(() => {
+      document.getElementById('savedMsg').classList.remove('show');
+    }, 4000);
+  }, 800);
+}
+</script>
+</body>
+</html>

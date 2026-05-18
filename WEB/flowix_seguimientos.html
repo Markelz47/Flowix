@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowix — Seguimientos</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#00C896;--gd:#008F6B;--gx:rgba(0,200,150,0.1);--gb:rgba(0,200,150,0.18);
+  --b:#0EA5E9;--bx:rgba(14,165,233,0.1);
+  --o:#F59E0B;--ox:rgba(245,158,11,0.1);
+  --r:#EF4444;--rx:rgba(239,68,68,0.1);
+  --bg:#05080B;--bg2:#080D12;--s1:#0C1520;--s2:#101C28;--s3:#152030;
+  --t1:#EDF2F8;--t2:#7A94AE;--t3:#415A72;--bd:rgba(255,255,255,0.055);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;font-size:14px}
+
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:rgba(5,8,11,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--g);letter-spacing:-.5px;text-decoration:none}
+.logo em{color:var(--b);font-style:normal}
+.nav-back{font-size:13px;font-weight:500;color:var(--t2);text-decoration:none;background:var(--s1);border:1px solid var(--bd);padding:8px 16px;border-radius:50px;transition:color .2s}
+.nav-back:hover{color:var(--t1)}
+
+.wrap{max-width:1000px;margin:0 auto;padding:32px 24px 80px}
+.page-header{margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.page-header h1{font-family:'Syne',sans-serif;font-size:clamp(22px,3.5vw,32px);font-weight:800;letter-spacing:-1px}
+.page-header h1 span{background:linear-gradient(135deg,var(--g),var(--b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.week-nav{display:flex;align-items:center;gap:12px}
+.wn-btn{background:var(--s1);border:1px solid var(--bd);color:var(--t2);padding:8px 14px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.wn-btn:hover{color:var(--t1);border-color:rgba(255,255,255,.12)}
+.wn-label{font-size:14px;font-weight:600;color:var(--t1)}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.stat{background:var(--s1);border:1px solid var(--bd);border-radius:13px;padding:16px;display:flex;align-items:center;gap:12px}
+.sic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.stat.g .sic{background:var(--gx)} .stat.b .sic{background:var(--bx)} .stat.o .sic{background:var(--ox)} .stat.r .sic{background:var(--rx)}
+.sv{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-1px;line-height:1}
+.stat.g .sv{color:var(--g)} .stat.b .sv{color:var(--b)} .stat.o .sv{color:var(--o)} .stat.r .sv{color:var(--r)}
+.sl{font-size:11px;color:var(--t3);margin-top:2px}
+
+/* CALENDAR */
+.calendar{background:var(--s1);border:1px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:20px}
+.cal-header{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--bd)}
+.cal-day-name{padding:12px;text-align:center;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3)}
+.cal-body{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-cell{padding:10px 8px;border-right:1px solid var(--bd);border-bottom:1px solid var(--bd);min-height:80px;position:relative}
+.cal-cell:nth-child(7n){border-right:none}
+.cal-cell.today{background:var(--gx)}
+.cal-date{font-size:11px;font-weight:700;color:var(--t3);margin-bottom:6px}
+.cal-cell.today .cal-date{color:var(--g)}
+.cal-item{font-size:10px;font-weight:600;padding:3px 6px;border-radius:6px;margin-bottom:3px;cursor:pointer;transition:opacity .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-item:hover{opacity:.8}
+.ci-g{background:var(--gx);color:var(--g);border:1px solid var(--gb)}
+.ci-o{background:var(--ox);color:var(--o);border:1px solid rgba(245,158,11,.2)}
+.ci-r{background:var(--rx);color:var(--r);border:1px solid rgba(239,68,68,.2)}
+.ci-b{background:var(--bx);color:var(--b);border:1px solid rgba(14,165,233,.2)}
+
+/* LIST */
+.section-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ldot{width:6px;height:6px;border-radius:50%;animation:lp 2s ease infinite}
+.ldot.g{background:var(--g)} .ldot.o{background:var(--o)} .ldot.r{background:var(--r)}
+@keyframes lp{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,200,150,.4)}50%{opacity:.7;box-shadow:0 0 0 4px rgba(0,200,150,0)}}
+
+.seg-list{background:var(--s1);border:1px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:20px}
+.seg-row{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--bd);transition:background .15s}
+.seg-row:last-child{border-bottom:none}
+.seg-row:hover{background:rgba(255,255,255,.02)}
+.seg-av{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:var(--bg)}
+.seg-info{flex:1;min-width:0}
+.seg-name{font-size:13px;font-weight:700;color:var(--t1)}
+.seg-detail{font-size:11px;color:var(--t3);margin-top:2px}
+.seg-status{font-size:11px;font-weight:700;padding:4px 10px;border-radius:50px;white-space:nowrap}
+.ss-pend{background:var(--bx);color:var(--b);border:1px solid rgba(14,165,233,.2)}
+.ss-env{background:var(--ox);color:var(--o);border:1px solid rgba(245,158,11,.2)}
+.ss-ok{background:var(--gx);color:var(--g);border:1px solid var(--gb)}
+.ss-alert{background:var(--rx);color:var(--r);border:1px solid rgba(239,68,68,.2)}
+.seg-btn{padding:7px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--gb);background:var(--gx);color:var(--g);transition:all .2s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.seg-btn:hover{background:var(--g);color:var(--bg)}
+.seg-btn.done{background:var(--s2);border-color:var(--bd);color:var(--t3);cursor:default}
+
+/* ADHERENCIA */
+.adh-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.adh-card{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:18px}
+.adh-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.adh-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:12px;color:var(--bg);flex-shrink:0}
+.adh-name{font-size:13px;font-weight:600;color:var(--t1)}
+.adh-pct{margin-left:auto;font-family:'Syne',sans-serif;font-size:18px;font-weight:800}
+.adh-bar{height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
+.adh-fill{height:100%;border-radius:3px}
+.af-g{background:linear-gradient(90deg,var(--gd),var(--g))}
+.af-o{background:linear-gradient(90deg,#B45309,var(--o))}
+.af-r{background:linear-gradient(90deg,#B91C1C,var(--r))}
+.adh-label{font-size:11px;color:var(--t3);margin-top:6px}
+
+@media(max-width:640px){
+  nav{padding:14px 16px}
+  .wrap{padding:20px 16px 60px}
+  .cal-item{display:none}
+  .cal-cell{min-height:50px}
+  .adh-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">Flow<em>ix</em></a>
+  <a class="nav-back" href="flowix_dashboard.html">← Dashboard</a>
+</nav>
+
+<div class="wrap">
+  <div class="page-header">
+    <h1>Centro de <span>seguimientos</span></h1>
+    <div class="week-nav">
+      <button class="wn-btn">← Anterior</button>
+      <span class="wn-label">5–11 mayo 2025</span>
+      <button class="wn-btn">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat g"><div class="sic">✅</div><div><div class="sv">5</div><div class="sl">Completados</div></div></div>
+    <div class="stat b"><div class="sic">📤</div><div><div class="sv">3</div><div class="sl">Enviados</div></div></div>
+    <div class="stat o"><div class="sic">⏳</div><div><div class="sv">4</div><div class="sl">Pendientes</div></div></div>
+    <div class="stat r"><div class="sic">🔴</div><div><div class="sv">2</div><div class="sl">Sin respuesta</div></div></div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="calendar">
+    <div class="cal-header">
+      <div class="cal-day-name">Lun</div>
+      <div class="cal-day-name">Mar</div>
+      <div class="cal-day-name">Mié</div>
+      <div class="cal-day-name">Jue</div>
+      <div class="cal-day-name">Vie</div>
+      <div class="cal-day-name">Sáb</div>
+      <div class="cal-day-name">Dom</div>
+    </div>
+    <div class="cal-body">
+      <div class="cal-cell today">
+        <div class="cal-date">5 (Hoy)</div>
+        <div class="cal-item ci-g">Sebastián</div>
+        <div class="cal-item ci-b">Ana Belén</div>
+      </div>
+      <div class="cal-cell"><div class="cal-date">6</div><div class="cal-item ci-o">Laura</div></div>
+      <div class="cal-cell"><div class="cal-date">7</div><div class="cal-item ci-g">Marco</div></div>
+      <div class="cal-cell"><div class="cal-date">8</div></div>
+      <div class="cal-cell"><div class="cal-date">9</div><div class="cal-item ci-r">Diego ⚠️</div></div>
+      <div class="cal-cell"><div class="cal-date">10</div></div>
+      <div class="cal-cell"><div class="cal-date">11</div></div>
+    </div>
+  </div>
+
+  <!-- PENDIENTES HOY -->
+  <div class="section-title"><div class="ldot o"></div>Pendientes esta semana</div>
+  <div class="seg-list">
+    <div class="seg-row">
+      <div class="seg-av" style="background:linear-gradient(135deg,#00C896,#0EA5E9)">S</div>
+      <div class="seg-info"><div class="seg-name">Sebastián García</div><div class="seg-detail">Seguimiento semanal · Semana 4 · Hoy</div></div>
+      <span class="seg-status ss-pend">Pendiente</span>
+      <button class="seg-btn" onclick="window.location.href='flowix_mensajes.html'">Enviar mensaje</button>
+    </div>
+    <div class="seg-row">
+      <div class="seg-av" style="background:linear-gradient(135deg,#8B5CF6,#EC4899)">A</div>
+      <div class="seg-info"><div class="seg-name">Ana Belén Torres</div><div class="seg-detail">Seguimiento semanal · Semana 1 · Hoy</div></div>
+      <span class="seg-status ss-pend">Pendiente</span>
+      <button class="seg-btn" onclick="window.location.href='flowix_mensajes.html'">Enviar mensaje</button>
+    </div>
+    <div class="seg-row">
+      <div class="seg-av" style="background:linear-gradient(135deg,#F59E0B,#F97316)">L</div>
+      <div class="seg-info"><div class="seg-name">Laura Martínez</div><div class="seg-detail">Seguimiento semanal · Semana 3 · Mañana</div></div>
+      <span class="seg-status ss-pend">Pendiente</span>
+      <button class="seg-btn" onclick="window.location.href='flowix_mensajes.html'">Enviar mensaje</button>
+    </div>
+    <div class="seg-row">
+      <div class="seg-av" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">M</div>
+      <div class="seg-info"><div class="seg-name">Marco Fernández</div><div class="seg-detail">Seguimiento semanal · Semana 7 · Miércoles</div></div>
+      <span class="seg-status ss-env">Enviado</span>
+      <button class="seg-btn done">Enviado ✓</button>
+    </div>
+  </div>
+
+  <!-- ALERTAS -->
+  <div class="section-title"><div class="ldot r"></div>Alertas urgentes</div>
+  <div class="seg-list">
+    <div class="seg-row">
+      <div class="seg-av" style="background:linear-gradient(135deg,#EF4444,#B91C1C)">D</div>
+      <div class="seg-info"><div class="seg-name">Diego Ramírez</div><div class="seg-detail">12 días sin responder · Riesgo abandono alto · Sem 10/12</div></div>
+      <span class="seg-status ss-alert">🔴 Urgente</span>
+      <button class="seg-btn" onclick="window.location.href='flowix_mensajes.html'" style="border-color:rgba(239,68,68,.3);background:var(--rx);color:var(--r)">Anti-abandono</button>
+    </div>
+    <div class="seg-row">
+      <div class="seg-av" style="background:linear-gradient(135deg,#F59E0B,#F97316)">L</div>
+      <div class="seg-info"><div class="seg-name">Laura Martínez</div><div class="seg-detail">5 días sin fotos de seguimiento · Semana 3</div></div>
+      <span class="seg-status ss-alert">⚠ Atención</span>
+      <button class="seg-btn" onclick="window.location.href='flowix_mensajes.html'" style="border-color:rgba(245,158,11,.3);background:var(--ox);color:var(--o)">Recordatorio</button>
+    </div>
+  </div>
+
+  <!-- ADHERENCIA -->
+  <div class="section-title"><div class="ldot g"></div>Tasa de adherencia — último mes</div>
+  <div class="adh-grid">
+    <div class="adh-card">
+      <div class="adh-header">
+        <div class="adh-av" style="background:linear-gradient(135deg,#00C896,#0EA5E9)">S</div>
+        <div class="adh-name">Sebastián</div>
+        <div class="adh-pct" style="color:var(--g)">92%</div>
+      </div>
+      <div class="adh-bar"><div class="adh-fill af-g" style="width:92%"></div></div>
+      <div class="adh-label">11 de 12 seguimientos respondidos</div>
+    </div>
+    <div class="adh-card">
+      <div class="adh-header">
+        <div class="adh-av" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">M</div>
+        <div class="adh-name">Marco</div>
+        <div class="adh-pct" style="color:var(--g)">100%</div>
+      </div>
+      <div class="adh-bar"><div class="adh-fill af-g" style="width:100%"></div></div>
+      <div class="adh-label">12 de 12 seguimientos respondidos</div>
+    </div>
+    <div class="adh-card">
+      <div class="adh-header">
+        <div class="adh-av" style="background:linear-gradient(135deg,#F59E0B,#F97316)">L</div>
+        <div class="adh-name">Laura</div>
+        <div class="adh-pct" style="color:var(--o)">58%</div>
+      </div>
+      <div class="adh-bar"><div class="adh-fill af-o" style="width:58%"></div></div>
+      <div class="adh-label">7 de 12 seguimientos respondidos</div>
+    </div>
+    <div class="adh-card">
+      <div class="adh-header">
+        <div class="adh-av" style="background:linear-gradient(135deg,#EF4444,#B91C1C)">D</div>
+        <div class="adh-name">Diego</div>
+        <div class="adh-pct" style="color:var(--r)">25%</div>
+      </div>
+      <div class="adh-bar"><div class="adh-fill af-r" style="width:25%"></div></div>
+      <div class="adh-label">3 de 12 seguimientos respondidos</div>
+    </div>
+    <div class="adh-card">
+      <div class="adh-header">
+        <div class="adh-av" style="background:linear-gradient(135deg,#8B5CF6,#EC4899)">A</div>
+        <div class="adh-name">Ana Belén</div>
+        <div class="adh-pct" style="color:var(--g)">100%</div>
+      </div>
+      <div class="adh-bar"><div class="adh-fill af-g" style="width:100%"></div></div>
+      <div class="adh-label">4 de 4 seguimientos respondidos</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowix — Clientes</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#00C896;--gd:#008F6B;--gx:rgba(0,200,150,0.1);--gb:rgba(0,200,150,0.18);
+  --b:#0EA5E9;--bx:rgba(14,165,233,0.1);--bb:rgba(14,165,233,0.18);
+  --o:#F59E0B;--ox:rgba(245,158,11,0.1);
+  --r:#EF4444;--rx:rgba(239,68,68,0.1);
+  --bg:#05080B;--bg2:#080D12;--s1:#0C1520;--s2:#101C28;--s3:#152030;
+  --t1:#EDF2F8;--t2:#7A94AE;--t3:#415A72;--bd:rgba(255,255,255,0.055);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;font-size:14px}
+
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:rgba(5,8,11,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--g);letter-spacing:-.5px;text-decoration:none}
+.logo em{color:var(--b);font-style:normal}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-back{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--t2);text-decoration:none;background:var(--s1);border:1px solid var(--bd);padding:8px 16px;border-radius:50px;transition:color .2s}
+.nav-back:hover{color:var(--t1)}
+.nav-new{background:linear-gradient(135deg,var(--gd),var(--g));color:var(--bg);border:none;padding:9px 18px;border-radius:50px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none}
+
+.wrap{max-width:1100px;margin:0 auto;padding:32px 24px 80px}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px}
+.stat{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:18px;display:flex;align-items:center;gap:14px}
+.stat-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.stat.g .stat-icon{background:var(--gx)} .stat.b .stat-icon{background:var(--bx)} .stat.o .stat-icon{background:var(--ox)} .stat.r .stat-icon{background:var(--rx)}
+.stat-val{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-1px;line-height:1}
+.stat.g .stat-val{color:var(--g)} .stat.b .stat-val{color:var(--b)} .stat.o .stat-val{color:var(--o)} .stat.r .stat-val{color:var(--r)}
+.stat-lbl{font-size:11px;color:var(--t3);margin-top:2px}
+
+/* SEARCH & FILTERS */
+.toolbar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.search{flex:1;min-width:200px;background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;font-size:14px;color:var(--t1);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.search:focus{border-color:var(--gb)}
+.search::placeholder{color:var(--t3)}
+.filter-btn{padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--s1);color:var(--t2);transition:all .18s;white-space:nowrap}
+.filter-btn.active{background:var(--gx);border-color:var(--gb);color:var(--g)}
+
+/* CLIENT GRID */
+.clients-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+
+.client-card{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:20px;cursor:pointer;transition:all .2s;animation:fadeup .4s ease}
+.client-card:hover{border-color:var(--gb);transform:translateY(-2px)}
+@keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.cc-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.cc-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--bg);flex-shrink:0}
+.cc-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--t1)}
+.cc-goal{font-size:12px;color:var(--t3);margin-top:2px}
+.cc-status{margin-left:auto;font-size:11px;font-weight:700;padding:4px 10px;border-radius:50px}
+.s-ok{background:var(--gx);color:var(--g);border:1px solid var(--gb)}
+.s-warn{background:var(--ox);color:var(--o);border:1px solid rgba(245,158,11,.2)}
+.s-alert{background:var(--rx);color:var(--r);border:1px solid rgba(239,68,68,.2)}
+
+.cc-progress{margin-bottom:14px}
+.cc-week{display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-bottom:5px}
+.cc-bar{height:4px;background:var(--s3);border-radius:2px;overflow:hidden}
+.cc-fill{height:100%;border-radius:2px}
+.fill-g{background:linear-gradient(90deg,var(--gd),var(--g))}
+.fill-o{background:linear-gradient(90deg,#B45309,var(--o))}
+.fill-r{background:linear-gradient(90deg,#B91C1C,var(--r))}
+
+.cc-info{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.cc-tag{font-size:11px;font-weight:600;padding:3px 9px;border-radius:50px;background:var(--s2);color:var(--t3);border:1px solid var(--bd)}
+
+.cc-actions{display:flex;gap:8px}
+.cc-btn{flex:1;padding:8px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--s2);color:var(--t2);transition:all .18s;text-align:center;font-family:'DM Sans',sans-serif}
+.cc-btn:hover{border-color:var(--gb);color:var(--g);background:var(--gx)}
+.cc-btn.primary{background:var(--gx);border-color:var(--gb);color:var(--g)}
+.cc-btn.primary:hover{background:var(--g);color:var(--bg)}
+
+/* MODAL FICHA */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.ov.open{display:flex}
+.ficha{background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:0;width:100%;max-width:700px;margin:auto;animation:fadeup .3s ease;overflow:hidden}
+
+.ficha-header{padding:24px 28px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:16px}
+.ficha-av{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--bg);flex-shrink:0}
+.ficha-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
+.ficha-sub{font-size:13px;color:var(--t3);margin-top:3px}
+.ficha-close{margin-left:auto;background:var(--s2);border:1px solid var(--bd);color:var(--t2);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ficha-close:hover{color:var(--t1)}
+
+.ficha-tabs{display:flex;border-bottom:1px solid var(--bd);padding:0 28px}
+.ftab{padding:14px 16px;font-size:13px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.ftab.active{color:var(--g);border-bottom-color:var(--g)}
+
+.ficha-body{padding:24px 28px}
+.ftab-content{display:none}
+.ftab-content.active{display:block}
+
+.fi-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.fi-field{display:flex;flex-direction:column;gap:4px}
+.fi-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3)}
+.fi-val{font-size:14px;color:var(--t1);font-weight:500}
+
+.peso-entry{display:flex;gap:10px;margin-bottom:12px;align-items:center}
+.peso-date{font-size:12px;color:var(--t3);width:90px;flex-shrink:0}
+.peso-val{font-size:15px;font-weight:700;color:var(--g)}
+.peso-change{font-size:12px;color:var(--t3);margin-left:auto}
+.peso-change.pos{color:var(--r)}
+.peso-change.neg{color:var(--g)}
+
+.nota-entry{background:var(--s2);border-radius:10px;padding:12px;margin-bottom:10px}
+.nota-date{font-size:11px;color:var(--t3);margin-bottom:4px}
+.nota-text{font-size:13px;color:var(--t1);line-height:1.5}
+
+.add-nota{display:flex;gap:8px;margin-top:12px}
+.add-nota textarea{flex:1;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--t1);font-family:'DM Sans',sans-serif;outline:none;resize:none;min-height:60px}
+.add-nota textarea:focus{border-color:var(--gb)}
+.add-nota button{align-self:flex-end;background:var(--gx);border:1px solid var(--gb);color:var(--g);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
+
+.rutina-entry{background:var(--s2);border-radius:10px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.rutina-icon{font-size:20px}
+.rutina-name{font-size:13px;font-weight:600;color:var(--t1)}
+.rutina-date{font-size:11px;color:var(--t3);margin-top:2px}
+.rutina-btn{margin-left:auto;font-size:12px;font-weight:600;color:var(--g);cursor:pointer;padding:6px 12px;border-radius:50px;border:1px solid var(--gb);background:var(--gx)}
+
+.foto-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.foto-slot{aspect-ratio:3/4;border-radius:10px;background:var(--s2);border:1px dashed var(--bd);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:border-color .2s}
+.foto-slot:hover{border-color:var(--gb)}
+.foto-slot .f-icon{font-size:22px;opacity:.4}
+.foto-slot .f-label{font-size:10px;color:var(--t3);text-align:center}
+
+.ficha-actions{display:flex;gap:10px;padding:20px 28px;border-top:1px solid var(--bd);flex-wrap:wrap}
+.fa-btn{flex:1;min-width:120px;padding:11px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--s2);color:var(--t2);transition:all .2s;font-family:'DM Sans',sans-serif;text-align:center}
+.fa-btn:hover{border-color:var(--gb);color:var(--g);background:var(--gx)}
+.fa-btn.primary{background:var(--g);border-color:var(--g);color:var(--bg)}
+.fa-btn.primary:hover{background:var(--gd)}
+
+@media(max-width:640px){
+  nav{padding:14px 16px}
+  .wrap{padding:20px 16px 60px}
+  .clients-grid{grid-template-columns:1fr}
+  .fi-grid{grid-template-columns:1fr}
+  .foto-grid{grid-template-columns:repeat(2,1fr)}
+  .ficha{margin:0}
+  .ficha-header{padding:18px 20px}
+  .ficha-body{padding:18px 20px}
+  .ficha-tabs{padding:0 20px}
+  .ficha-actions{padding:16px 20px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">Flow<em>ix</em></a>
+  <div class="nav-right">
+    <a class="nav-back" href="flowix_dashboard.html">← Dashboard</a>
+    <a class="nav-new" href="flowix_generador.html">➕ Nuevo cliente</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat g"><div class="stat-icon">👥</div><div><div class="stat-val">12</div><div class="stat-lbl">Clientes activos</div></div></div>
+    <div class="stat b"><div class="stat-icon">📋</div><div><div class="stat-val">48</div><div class="stat-lbl">Rutinas generadas</div></div></div>
+    <div class="stat o"><div class="stat-icon">⚠️</div><div><div class="stat-val">2</div><div class="stat-lbl">Sin responder</div></div></div>
+    <div class="stat r"><div class="stat-icon">🔴</div><div><div class="stat-val">1</div><div class="stat-lbl">Riesgo abandono</div></div></div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <input class="search" placeholder="🔍  Buscar cliente..." oninput="filtrar(this.value)"/>
+    <button class="filter-btn active" onclick="setFilter('todos',this)">Todos</button>
+    <button class="filter-btn" onclick="setFilter('activo',this)">Activos</button>
+    <button class="filter-btn" onclick="setFilter('alerta',this)">Con alerta</button>
+  </div>
+
+  <!-- CLIENTS -->
+  <div class="clients-grid" id="clientsGrid">
+
+    <div class="client-card" onclick="openFicha('sebastian')" data-status="activo">
+      <div class="cc-header">
+        <div class="cc-av" style="background:linear-gradient(135deg,#00C896,#0EA5E9)">S</div>
+        <div><div class="cc-name">Sebastián García</div><div class="cc-goal">Pérdida de grasa · Sem 4/12</div></div>
+        <span class="cc-status s-ok">✓ Activo</span>
+      </div>
+      <div class="cc-progress">
+        <div class="cc-week"><span>Progreso</span><span>33%</span></div>
+        <div class="cc-bar"><div class="cc-fill fill-g" style="width:33%"></div></div>
+      </div>
+      <div class="cc-info">
+        <span class="cc-tag">80 kg</span>
+        <span class="cc-tag">Intermedio</span>
+        <span class="cc-tag">4 días/sem</span>
+        <span class="cc-tag">Última: hace 1 día</span>
+      </div>
+      <div class="cc-actions">
+        <div class="cc-btn primary" onclick="event.stopPropagation();window.location.href='flowix_generador.html'">🏋️ Rutina</div>
+        <div class="cc-btn" onclick="event.stopPropagation();openFicha('sebastian')">📁 Ficha</div>
+        <div class="cc-btn" onclick="event.stopPropagation()">💬 Mensaje</div>
+      </div>
+    </div>
+
+    <div class="client-card" onclick="openFicha('marco')" data-status="activo">
+      <div class="cc-header">
+        <div class="cc-av" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">M</div>
+        <div><div class="cc-name">Marco Fernández</div><div class="cc-goal">Ganancia muscular · Sem 7/12</div></div>
+        <span class="cc-status s-ok">✓ Activo</span>
+      </div>
+      <div class="cc-progress">
+        <div class="cc-week"><span>Progreso</span><span>58%</span></div>
+        <div class="cc-bar"><div class="cc-fill fill-g" style="width:58%"></div></div>
+      </div>
+      <div class="cc-info">
+        <span class="cc-tag">85 kg</span>
+        <span class="cc-tag">Avanzado</span>
+        <span class="cc-tag">5 días/sem</span>
+        <span class="cc-tag">Última: hace 2 días</span>
+      </div>
+      <div class="cc-actions">
+        <div class="cc-btn primary" onclick="event.stopPropagation();window.location.href='flowix_generador.html'">🏋️ Rutina</div>
+        <div class="cc-btn" onclick="event.stopPropagation();openFicha('marco')">📁 Ficha</div>
+        <div class="cc-btn" onclick="event.stopPropagation()">💬 Mensaje</div>
+      </div>
+    </div>
+
+    <div class="client-card" onclick="openFicha('laura')" data-status="alerta">
+      <div class="cc-header">
+        <div class="cc-av" style="background:linear-gradient(135deg,#F59E0B,#F97316)">L</div>
+        <div><div class="cc-name">Laura Martínez</div><div class="cc-goal">Pérdida de grasa · Sem 3/12</div></div>
+        <span class="cc-status s-warn">⚠ Sin responder</span>
+      </div>
+      <div class="cc-progress">
+        <div class="cc-week"><span>Progreso</span><span>25%</span></div>
+        <div class="cc-bar"><div class="cc-fill fill-o" style="width:25%"></div></div>
+      </div>
+      <div class="cc-info">
+        <span class="cc-tag">65 kg</span>
+        <span class="cc-tag">Principiante</span>
+        <span class="cc-tag">3 días/sem</span>
+        <span class="cc-tag">Última: hace 5 días</span>
+      </div>
+      <div class="cc-actions">
+        <div class="cc-btn primary" onclick="event.stopPropagation();window.location.href='flowix_generador.html'">🏋️ Rutina</div>
+        <div class="cc-btn" onclick="event.stopPropagation();openFicha('laura')">📁 Ficha</div>
+        <div class="cc-btn" onclick="event.stopPropagation()">🔴 Alerta</div>
+      </div>
+    </div>
+
+    <div class="client-card" onclick="openFicha('diego')" data-status="alerta">
+      <div class="cc-header">
+        <div class="cc-av" style="background:linear-gradient(135deg,#EF4444,#B91C1C)">D</div>
+        <div><div class="cc-name">Diego Ramírez</div><div class="cc-goal">Mantenimiento · Sem 10/12</div></div>
+        <span class="cc-status s-alert">🔴 Riesgo abandono</span>
+      </div>
+      <div class="cc-progress">
+        <div class="cc-week"><span>Progreso</span><span>83%</span></div>
+        <div class="cc-bar"><div class="cc-fill fill-r" style="width:83%"></div></div>
+      </div>
+      <div class="cc-info">
+        <span class="cc-tag">78 kg</span>
+        <span class="cc-tag">Intermedio</span>
+        <span class="cc-tag">4 días/sem</span>
+        <span class="cc-tag">Última: hace 12 días</span>
+      </div>
+      <div class="cc-actions">
+        <div class="cc-btn primary" onclick="event.stopPropagation();window.location.href='flowix_generador.html'">🏋️ Rutina</div>
+        <div class="cc-btn" onclick="event.stopPropagation();openFicha('diego')">📁 Ficha</div>
+        <div class="cc-btn" onclick="event.stopPropagation()">🔴 Alerta</div>
+      </div>
+    </div>
+
+    <div class="client-card" onclick="openFicha('ana')" data-status="activo">
+      <div class="cc-header">
+        <div class="cc-av" style="background:linear-gradient(135deg,#8B5CF6,#EC4899)">A</div>
+        <div><div class="cc-name">Ana Belén Torres</div><div class="cc-goal">Ganancia muscular · Sem 1/12</div></div>
+        <span class="cc-status s-ok">✓ Activo</span>
+      </div>
+      <div class="cc-progress">
+        <div class="cc-week"><span>Progreso</span><span>8%</span></div>
+        <div class="cc-bar"><div class="cc-fill fill-g" style="width:8%"></div></div>
+      </div>
+      <div class="cc-info">
+        <span class="cc-tag">58 kg</span>
+        <span class="cc-tag">Principiante</span>
+        <span class="cc-tag">3 días/sem</span>
+        <span class="cc-tag">Última: hoy</span>
+      </div>
+      <div class="cc-actions">
+        <div class="cc-btn primary" onclick="event.stopPropagation();window.location.href='flowix_generador.html'">🏋️ Rutina</div>
+        <div class="cc-btn" onclick="event.stopPropagation();openFicha('ana')">📁 Ficha</div>
+        <div class="cc-btn" onclick="event.stopPropagation()">💬 Mensaje</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FICHA MODAL -->
+<div class="ov" id="fichaModal" onclick="if(event.target===this)closeFicha()">
+  <div class="ficha">
+    <div class="ficha-header">
+      <div class="ficha-av" id="fichaAv" style="background:linear-gradient(135deg,#00C896,#0EA5E9)">S</div>
+      <div>
+        <div class="ficha-name" id="fichaNombre">Sebastián García</div>
+        <div class="ficha-sub" id="fichaGoal">Pérdida de grasa · Semana 4/12 · Intermedio</div>
+      </div>
+      <button class="ficha-close" onclick="closeFicha()">✕</button>
+    </div>
+
+    <div class="ficha-tabs">
+      <div class="ftab active" onclick="showTab('info')">Perfil</div>
+      <div class="ftab" onclick="showTab('peso')">Evolución</div>
+      <div class="ftab" onclick="showTab('fotos')">Fotos</div>
+      <div class="ftab" onclick="showTab('rutinas')">Rutinas</div>
+      <div class="ftab" onclick="showTab('notas')">Notas</div>
+    </div>
+
+    <div class="ficha-body">
+      <!-- PERFIL -->
+      <div class="ftab-content active" id="tab-info">
+        <div class="fi-grid">
+          <div class="fi-field"><div class="fi-label">Edad</div><div class="fi-val">32 años</div></div>
+          <div class="fi-field"><div class="fi-label">Peso inicial</div><div class="fi-val">85 kg</div></div>
+          <div class="fi-field"><div class="fi-label">Peso actual</div><div class="fi-val">80 kg</div></div>
+          <div class="fi-field"><div class="fi-label">Altura</div><div class="fi-val">178 cm</div></div>
+          <div class="fi-field"><div class="fi-label">Objetivo</div><div class="fi-val">Pérdida de grasa</div></div>
+          <div class="fi-field"><div class="fi-label">Nivel</div><div class="fi-val">Intermedio</div></div>
+          <div class="fi-field"><div class="fi-label">Días/semana</div><div class="fi-val">4 días</div></div>
+          <div class="fi-field"><div class="fi-label">Inicio del plan</div><div class="fi-val">1 abril 2025</div></div>
+          <div class="fi-field"><div class="fi-label">Lesiones</div><div class="fi-val">Tendinitis rodilla derecha leve</div></div>
+          <div class="fi-field"><div class="fi-label">Contexto calórico</div><div class="fi-val">Déficit moderado</div></div>
+        </div>
+      </div>
+
+      <!-- EVOLUCIÓN PESO -->
+      <div class="ftab-content" id="tab-peso">
+        <p style="font-size:12px;color:var(--t3);margin-bottom:16px">Registro de peso cada 15 días</p>
+        <div class="peso-entry"><div class="peso-date">1 abr 2025</div><div class="peso-val">85.0 kg</div><div class="peso-change">Inicio</div></div>
+        <div class="peso-entry"><div class="peso-date">15 abr 2025</div><div class="peso-val">83.2 kg</div><div class="peso-change neg">−1.8 kg ↓</div></div>
+        <div class="peso-entry"><div class="peso-date">1 may 2025</div><div class="peso-val">81.5 kg</div><div class="peso-change neg">−1.7 kg ↓</div></div>
+        <div class="peso-entry"><div class="peso-date">15 may 2025</div><div class="peso-val">80.0 kg</div><div class="peso-change neg">−1.5 kg ↓</div></div>
+        <div style="margin-top:16px;display:flex;gap:8px">
+          <input placeholder="Nuevo peso (kg)" style="flex:1;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--t1);font-family:'DM Sans',sans-serif;outline:none"/>
+          <button style="background:var(--gx);border:1px solid var(--gb);color:var(--g);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Añadir</button>
+        </div>
+      </div>
+
+      <!-- FOTOS -->
+      <div class="ftab-content" id="tab-fotos">
+        <p style="font-size:12px;color:var(--t3);margin-bottom:14px">Fotos de seguimiento — 4 costados en ayunas</p>
+        <div class="foto-grid">
+          <div class="foto-slot"><div class="f-icon">📸</div><div class="f-label">Frente</div></div>
+          <div class="foto-slot"><div class="f-icon">📸</div><div class="f-label">Espalda</div></div>
+          <div class="foto-slot"><div class="f-icon">📸</div><div class="f-label">Lateral der.</div></div>
+          <div class="foto-slot"><div class="f-icon">📸</div><div class="f-label">Lateral izq.</div></div>
+        </div>
+        <p style="font-size:11px;color:var(--t3);text-align:center">Semana 1 · 1 abril 2025 — Punto de partida</p>
+      </div>
+
+      <!-- RUTINAS -->
+      <div class="ftab-content" id="tab-rutinas">
+        <div class="rutina-entry">
+          <div class="rutina-icon">📋</div>
+          <div><div class="rutina-name">Rutina Semana 1-4 · Déficit moderado</div><div class="rutina-date">Generada el 1 abril 2025</div></div>
+          <div class="rutina-btn">Ver</div>
+        </div>
+        <div class="rutina-entry">
+          <div class="rutina-icon">📋</div>
+          <div><div class="rutina-name">Rutina Semana 5-8 · Ajuste volumen</div><div class="rutina-date">Generada el 29 abril 2025</div></div>
+          <div class="rutina-btn">Ver</div>
+        </div>
+        <div style="margin-top:14px">
+          <button onclick="window.location.href='flowix_generador.html'" style="width:100%;padding:12px;border-radius:10px;background:var(--gx);border:1px solid var(--gb);color:var(--g);font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">✨ Generar nueva rutina</button>
+        </div>
+      </div>
+
+      <!-- NOTAS -->
+      <div class="ftab-content" id="tab-notas">
+        <div class="nota-entry">
+          <div class="nota-date">15 abril 2025</div>
+          <div class="nota-text">Tiende a compensar en press banca con el hombro derecho. Recordarle activar el pectoral antes de cada serie. Buena adherencia a la dieta esta semana.</div>
+        </div>
+        <div class="nota-entry">
+          <div class="nota-date">1 mayo 2025</div>
+          <div class="nota-text">Ha subido peso en todos los ejercicios. La rodilla no le molesta con leg press pero sí con sentadilla profunda — mantener extensión de cuádriceps en máquina.</div>
+        </div>
+        <div class="add-nota">
+          <textarea placeholder="Añadir nota de seguimiento..."></textarea>
+          <button>Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ficha-actions">
+      <div class="fa-btn" onclick="window.location.href='flowix_mensajes.html'">💬 Mensaje IA</div>
+      <div class="fa-btn" onclick="window.location.href='flowix_generador.html'">🏋️ Nueva rutina</div>
+      <div class="fa-btn primary">📤 Exportar ficha</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentFilter = 'todos';
+
+function openFicha(id) {
+  document.getElementById('fichaModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeFicha() {
+  document.getElementById('fichaModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function showTab(name) {
+  document.querySelectorAll('.ftab').forEach((t,i) => {
+    const tabs = ['info','peso','fotos','rutinas','notas'];
+    t.classList.toggle('active', tabs[i] === name);
+  });
+  document.querySelectorAll('.ftab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+}
+function filtrar(val) {
+  document.querySelectorAll('.client-card').forEach(c => {
+    const name = c.querySelector('.cc-name').textContent.toLowerCase();
+    c.style.display = name.includes(val.toLowerCase()) ? '' : 'none';
+  });
+}
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.client-card').forEach(c => {
+    if (f === 'todos') c.style.display = '';
+    else c.style.display = c.dataset.status === f ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowix — Mensajes</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#00C896;--gd:#008F6B;--gx:rgba(0,200,150,0.1);--gb:rgba(0,200,150,0.18);
+  --b:#0EA5E9;--bx:rgba(14,165,233,0.1);--bb:rgba(14,165,233,0.18);
+  --o:#F59E0B;--ox:rgba(245,158,11,0.1);
+  --r:#EF4444;--rx:rgba(239,68,68,0.1);
+  --p:#8B5CF6;--px:rgba(139,92,246,0.1);
+  --bg:#05080B;--bg2:#080D12;--s1:#0C1520;--s2:#101C28;--s3:#152030;
+  --t1:#EDF2F8;--t2:#7A94AE;--t3:#415A72;--bd:rgba(255,255,255,0.055);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%;height:100%}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;font-size:14px;display:flex;flex-direction:column}
+
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:rgba(5,8,11,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);flex-shrink:0}
+.logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--g);letter-spacing:-.5px;text-decoration:none}
+.logo em{color:var(--b);font-style:normal}
+.nav-back{font-size:13px;font-weight:500;color:var(--t2);text-decoration:none;background:var(--s1);border:1px solid var(--bd);padding:8px 16px;border-radius:50px;transition:color .2s}
+.nav-back:hover{color:var(--t1)}
+
+.main{display:flex;flex:1;overflow:hidden}
+
+/* LEFT PANEL */
+.left{width:320px;flex-shrink:0;border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
+.left-header{padding:20px;border-bottom:1px solid var(--bd)}
+.left-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px}
+
+.client-select{width:100%;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--t1);font-family:'DM Sans',sans-serif;outline:none;margin-bottom:12px}
+.client-select:focus{border-color:var(--gb)}
+.client-select option{background:var(--s2)}
+
+.msg-types{flex:1;overflow-y:auto;padding:12px}
+.msg-type{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;cursor:pointer;transition:all .2s;margin-bottom:4px;border:1px solid transparent}
+.msg-type:hover{background:var(--s1);border-color:var(--bd)}
+.msg-type.active{background:var(--gx);border-color:var(--gb)}
+.mt-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.mt-name{font-size:13px;font-weight:600;color:var(--t1)}
+.mt-desc{font-size:11px;color:var(--t3);margin-top:2px;line-height:1.3}
+.msg-type.active .mt-name{color:var(--g)}
+
+/* RIGHT PANEL */
+.right{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.right-header{padding:20px 24px;border-bottom:1px solid var(--bd)}
+.right-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px}
+.right-sub{font-size:13px;color:var(--t3)}
+
+.msg-area{flex:1;padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+
+.gen-btn-wrap{padding:16px 24px;border-top:1px solid var(--bd);display:flex;gap:10px}
+.gen-btn{flex:1;padding:13px;border-radius:12px;font-size:14px;font-weight:700;font-family:'Syne',sans-serif;background:linear-gradient(135deg,var(--gd),var(--g));color:var(--bg);border:none;cursor:pointer;transition:all .3s;box-shadow:0 0 28px rgba(0,200,150,0.18)}
+.gen-btn:hover{transform:translateY(-1px);box-shadow:0 0 44px rgba(0,200,150,0.3)}
+.gen-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* MESSAGE PREVIEW */
+.msg-preview{background:var(--s1);border:1px solid var(--bd);border-radius:16px;overflow:hidden}
+.mp-header{padding:14px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.mp-icon{font-size:16px}
+.mp-title{font-size:13px;font-weight:700;color:var(--t1)}
+.mp-client{font-size:12px;color:var(--t3);margin-left:auto}
+
+.wa-preview{background:#0A1A0E;border-top:1px solid rgba(37,211,102,.1);padding:16px}
+.wa-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.wa-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--g),var(--b));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:var(--bg)}
+.wa-name{font-size:13px;font-weight:700;color:#25D366}
+.wa-app{font-size:11px;color:var(--t3)}
+.wa-bubble{background:#1F3A24;border-radius:0 12px 12px 12px;padding:12px 14px;font-size:13px;line-height:1.7;color:#E8F5E9;position:relative}
+.wa-bubble::before{content:'';position:absolute;top:0;left:-8px;border-top:9px solid #1F3A24;border-left:8px solid transparent}
+.wa-time{text-align:right;font-size:10px;color:rgba(255,255,255,.25);margin-top:6px}
+
+.mp-actions{padding:14px 18px;display:flex;gap:8px;border-top:1px solid var(--bd)}
+.ma{padding:8px 14px;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--s2);color:var(--t2);transition:all .2s;font-family:'DM Sans',sans-serif}
+.ma:hover{color:var(--t1);border-color:rgba(255,255,255,.12)}
+.ma.wa{background:#25D366;border-color:#25D366;color:#fff}
+.ma.wa:hover{background:#1da851}
+
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--t3);text-align:center;padding:40px}
+.empty-icon{font-size:48px;opacity:.3}
+.empty-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--t2)}
+.empty-sub{font-size:13px;line-height:1.6;max-width:280px}
+
+.dots{display:flex;gap:6px;justify-content:center;padding:20px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--g);animation:bb .9s ease infinite}
+.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+@keyframes bb{0%,100%{transform:translateY(0);opacity:.3}50%{transform:translateY(-5px);opacity:1}}
+.loading{display:none;flex-direction:column;align-items:center;gap:8px;padding:32px;font-size:13px;color:var(--t3)}
+.loading.show{display:flex}
+
+@media(max-width:700px){
+  .left{width:100%;border-right:none;border-bottom:1px solid var(--bd);max-height:280px}
+  .main{flex-direction:column}
+  nav{padding:14px 16px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">Flow<em>ix</em></a>
+  <a class="nav-back" href="flowix_dashboard.html">← Dashboard</a>
+</nav>
+
+<div class="main">
+
+  <!-- LEFT: TIPOS DE MENSAJE + SELECTOR CLIENTE -->
+  <div class="left">
+    <div class="left-header">
+      <div class="left-title">Centro de mensajes</div>
+      <select class="client-select" id="clientSelect" onchange="updateClient()">
+        <option value="">Seleccionar cliente...</option>
+        <option value="sebastian">Sebastián García</option>
+        <option value="marco">Marco Fernández</option>
+        <option value="laura">Laura Martínez</option>
+        <option value="diego">Diego Ramírez</option>
+        <option value="ana">Ana Belén Torres</option>
+      </select>
+    </div>
+
+    <div class="msg-types">
+      <div class="msg-type active" onclick="selectType(this,'seguimiento','Seguimiento semanal','¿Cómo te ha ido la semana? Revisión de entrenamientos y sensaciones.')">
+        <div class="mt-icon" style="background:var(--gx)">💬</div>
+        <div><div class="mt-name">Seguimiento semanal</div><div class="mt-desc">Revisión de la semana del cliente</div></div>
+      </div>
+      <div class="msg-type" onclick="selectType(this,'bienvenida','Bienvenida','Primer mensaje al nuevo cliente. Próximos pasos y qué esperar.')">
+        <div class="mt-icon" style="background:var(--bx)">👋</div>
+        <div><div class="mt-name">Bienvenida</div><div class="mt-desc">Primer mensaje al nuevo cliente</div></div>
+      </div>
+      <div class="msg-type" onclick="selectType(this,'fotos','Recordatorio de fotos','Aviso mensual para las fotos de seguimiento en ayunas.')">
+        <div class="mt-icon" style="background:var(--px)">📸</div>
+        <div><div class="mt-name">Recordatorio fotos</div><div class="mt-desc">Fotos mensuales de seguimiento</div></div>
+      </div>
+      <div class="msg-type" onclick="selectType(this,'peso','Recordatorio de peso','Aviso quincenal para el registro de peso en ayunas.')">
+        <div class="mt-icon" style="background:var(--ox)">⚖️</div>
+        <div><div class="mt-name">Recordatorio peso</div><div class="mt-desc">Registro quincenal del peso</div></div>
+      </div>
+      <div class="msg-type" onclick="selectType(this,'motivacion','Mensaje de motivación','Boost de motivación cuando el cliente necesita un empujón.')">
+        <div class="mt-icon" style="background:var(--gx)">💪</div>
+        <div><div class="mt-name">Motivación</div><div class="mt-desc">Cuando el cliente necesita un empujón</div></div>
+      </div>
+      <div class="msg-type" onclick="selectType(this,'hito','Felicitación de hito','Semana 4, 8 o 12 completada. Celebrar el progreso.')">
+        <div class="mt-icon" style="background:var(--ox)">🏆</div>
+        <div><div class="mt-name">Felicitación hito</div><div class="mt-desc">Semana 4, 8 o 12 completada</div></div>
+      </div>
+      <div class="msg-type" onclick="selectType(this,'abandono_suave','Anti-abandono suave','Para clientes que llevan pocos días sin responder.')">
+        <div class="mt-icon" style="background:var(--ox)">⚠️</div>
+        <div><div class="mt-name">Anti-abandono suave</div><div class="mt-desc">Sin respuesta 3-5 días</div></div>
+      </div>
+      <div class="msg-type" onclick="selectType(this,'abandono_urgente','Anti-abandono urgente','Para clientes en riesgo real de abandono.')">
+        <div class="mt-icon" style="background:var(--rx)">🔴</div>
+        <div><div class="mt-name">Anti-abandono urgente</div><div class="mt-desc">Sin respuesta más de 7 días</div></div>
+      </div>
+      <div class="msg-type" onclick="selectType(this,'nueva_rutina','Aviso nueva rutina','Cuando se entrega una rutina nueva al cliente.')">
+        <div class="mt-icon" style="background:var(--bx)">📋</div>
+        <div><div class="mt-name">Aviso nueva rutina</div><div class="mt-desc">Entrega de rutina actualizada</div></div>
+      </div>
+      <div class="msg-type" onclick="selectType(this,'pago','Recordatorio de pago','Aviso 3 días antes de la renovación mensual.')">
+        <div class="mt-icon" style="background:var(--px)">💳</div>
+        <div><div class="mt-name">Recordatorio pago</div><div class="mt-desc">Renovación mensual próxima</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: PREVIEW -->
+  <div class="right">
+    <div class="right-header">
+      <div class="right-title" id="rightTitle">Seguimiento semanal</div>
+      <div class="right-sub" id="rightSub">Selecciona un cliente y genera el mensaje personalizado</div>
+    </div>
+
+    <div class="msg-area" id="msgArea">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">💬</div>
+        <div class="empty-title">Listo para generar</div>
+        <div class="empty-sub">Selecciona un cliente arriba y pulsa "Generar mensaje" para crear un mensaje personalizado en tu voz.</div>
+      </div>
+      <div class="loading" id="loadingState">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <span>Flowix está preparando el mensaje...</span>
+      </div>
+    </div>
+
+    <div class="gen-btn-wrap">
+      <button class="gen-btn" id="genBtn" onclick="generarMensaje()">✨ Generar mensaje</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentType = 'seguimiento';
+let currentClient = '';
+let lastMsg = '';
+
+const clientes = {
+  sebastian: { nombre: 'Sebastián', semana: 4, objetivo: 'pérdida de grasa', dias: '12 días sin responder', inicial: 'S', color: 'linear-gradient(135deg,#00C896,#0EA5E9)' },
+  marco: { nombre: 'Marco', semana: 7, objetivo: 'ganancia muscular', dias: 'hace 2 días', inicial: 'M', color: 'linear-gradient(135deg,#F59E0B,#EF4444)' },
+  laura: { nombre: 'Laura', semana: 3, objetivo: 'pérdida de grasa', dias: 'hace 5 días', inicial: 'L', color: 'linear-gradient(135deg,#F59E0B,#F97316)' },
+  diego: { nombre: 'Diego', semana: 10, objetivo: 'mantenimiento', dias: 'hace 12 días', inicial: 'D', color: 'linear-gradient(135deg,#EF4444,#B91C1C)' },
+  ana: { nombre: 'Ana Belén', semana: 1, objetivo: 'ganancia muscular', dias: 'hoy', inicial: 'A', color: 'linear-gradient(135deg,#8B5CF6,#EC4899)' }
+};
+
+const mensajesPredefinidos = {
+  seguimiento: {
+    sebastian: '¡Hola Sebastián! 💪 ¿Cómo ha ido la semana? Cuéntame qué tal los entrenamientos, si has notado mejoras en los pesos y cómo has llevado la dieta. Esta semana toca fotos 📸 — frente, espalda y laterales en ayunas, buena luz y relajado. ¡Vamos guerrero, semana 4 ya dentro!',
+    marco: '¡Qué tal Marco! Semana 7 ya — estás en racha. Quiero saber cómo han ido los entrenos, si has subido pesos y si has tenido alguna molestia. ¿Cómo vas con la alimentación? Cuéntamelo todo. 💪',
+    laura: '¡Hola Laura! ¿Qué tal la semana? Cuéntame cómo han ido los entrenamientos y cómo te has sentido. Semana 3 ya completada — ¡vas genial! 🌟',
+    diego: '¡Hola Diego! ¿Qué tal la semana? Quiero saber cómo han ido los entrenos y cómo te encuentras. Cuéntame todo. 💪',
+    ana: '¡Hola Ana Belén! Primera semana completada — ¿cómo te has sentido? Es normal que el cuerpo esté adaptándose. Cuéntame qué ejercicios te han gustado más. ¡Lo estás haciendo genial! 🌟'
+  },
+  abandono_urgente: {
+    sebastian: '¡Hola Sebastián! ¿Todo bien? Solo quería escribirte para ver cómo estás — no por los entrenos, sino por ti. Sé que hay semanas que todo cuesta más. Recuerdo que cuando empezaste me dijiste que querías sentirte fuerte. Ese objetivo sigue ahí. Aquí estoy cuando quieras. 💙',
+    marco: '¡Hola Marco! ¿Todo bien por ahí? Hacía tiempo que no sabía de ti y quería escribirte. No te preocupes por nada — hay épocas que el cuerpo y la cabeza necesitan parar. Aquí estoy cuando quieras retomar. 💙',
+    laura: '¡Hola Laura! ¿Qué tal estás? Llevo unos días sin saber de ti y quería escribirte para ver cómo te encuentras. Un pequeño paso esta semana ya es mucho. ¿Me mandas las fotos cuando puedas? Sin prisa. Aquí estoy. 💪',
+    diego: '¡Hola Diego! ¿Todo bien? Solo quería escribirte para ver cómo estás — no por los entrenos, sino por ti. Ese objetivo sigue ahí. No tienes que volver al 100% — solo una sesión esta semana. Aquí estoy cuando quieras. 💙',
+    ana: '¡Hola Ana Belén! ¿Qué tal estás? Quería escribirte para ver cómo te encuentras. El inicio siempre es lo más difícil — y ya has demostrado que puedes. Aquí estoy. 💪'
+  },
+  bienvenida: {
+    sebastian: '¡Bienvenido Sebastián! 🎉 Me alegra mucho que hayas decidido dar este paso. Vamos a trabajar juntos para conseguir tu objetivo de pérdida de grasa de la manera más eficiente y sostenible. Esta semana necesito que me mandes las fotos de inicio — frente, espalda y laterales en ayunas, con buena luz. También anota tu peso en ayunas. ¡Empezamos! 💪',
+    marco: '¡Bienvenido Marco! 🎉 Vamos a darle caña juntos. Para empezar necesito las fotos de inicio y tu peso en ayunas. ¡Arrancamos fuerte! 💪',
+    laura: '¡Bienvenida Laura! 🎉 Estoy muy contento de que hayas decidido empezar. Vamos paso a paso y sin prisa — pero sin pausa. Necesito las fotos de inicio y tu peso en ayunas para tener el punto de partida. ¡Empezamos! 🌟',
+    diego: '¡Bienvenido Diego! 🎉 Vamos a trabajar juntos para conseguir tu objetivo. Para empezar necesito las fotos de inicio y tu peso en ayunas. ¡Arrancamos! 💪',
+    ana: '¡Bienvenida Ana Belén! 🎉 Me alegra mucho que hayas dado este paso. Vamos a trabajar juntos de forma progresiva y sin agobios. Para empezar necesito las fotos de inicio y tu peso en ayunas. ¡Empezamos! 🌟'
+  }
+};
+
+function selectType(el, type, title, desc) {
+  document.querySelectorAll('.msg-type').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentType = type;
+  document.getElementById('rightTitle').textContent = title;
+  document.getElementById('rightSub').textContent = desc;
+  document.getElementById('msgArea').innerHTML = '<div class="empty-state" id="emptyState"><div class="empty-icon">💬</div><div class="empty-title">Listo para generar</div><div class="empty-sub">Pulsa "Generar mensaje" para crear el mensaje personalizado.</div></div><div class="loading" id="loadingState"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span>Flowix está preparando el mensaje...</span></div>';
+}
+
+function updateClient() {
+  currentClient = document.getElementById('clientSelect').value;
+}
+
+function generarMensaje() {
+  if (!currentClient) {
+    alert('Selecciona un cliente primero');
+    return;
+  }
+  const c = clientes[currentClient];
+  document.getElementById('emptyState') && (document.getElementById('emptyState').style.display = 'none');
+  document.getElementById('loadingState').classList.add('show');
+  document.getElementById('genBtn').disabled = true;
+
+  setTimeout(() => {
+    const msgs = mensajesPredefinidos[currentType] || mensajesPredefinidos['seguimiento'];
+    const msg = (msgs && msgs[currentClient]) || `¡Hola ${c.nombre}! ¿Qué tal va todo? Cuéntame cómo ha ido la semana — entrenamientos, sensaciones y alimentación. ¡Aquí estoy! 💪`;
+    lastMsg = msg;
+
+    document.getElementById('loadingState').classList.remove('show');
+    document.getElementById('genBtn').disabled = false;
+
+    const area = document.getElementById('msgArea');
+    area.innerHTML = `
+      <div class="msg-preview">
+        <div class="mp-header">
+          <div class="mp-icon">💬</div>
+          <div class="mp-title">${document.getElementById('rightTitle').textContent}</div>
+          <div class="mp-client">Para: ${c.nombre}</div>
+        </div>
+        <div class="wa-preview">
+          <div class="wa-header">
+            <div class="wa-av" style="background:${c.color}">${c.inicial}</div>
+            <div><div class="wa-name">Tu entrenador</div><div class="wa-app">Vista previa WhatsApp</div></div>
+          </div>
+          <div class="wa-bubble">${msg.replace(/\n/g,'<br>')}</div>
+          <div class="wa-time">Ahora · ✓✓</div>
+        </div>
+        <div class="mp-actions">
+          <button class="ma" onclick="copiar()">📋 Copiar</button>
+          <button class="ma wa" onclick="enviarWA()">📱 Abrir en WhatsApp</button>
+          <button class="ma" onclick="generarMensaje()">↩ Regenerar</button>
+        </div>
+      </div>`;
+  }, 1500);
+}
+
+function copiar() { navigator.clipboard.writeText(lastMsg); }
+function enviarWA() {
+  const c = clientes[currentClient];
+  window.open(`https://wa.me/?text=${encodeURIComponent(lastMsg)}`, '_blank');
+}
+</script>
+</body>
+</html>
