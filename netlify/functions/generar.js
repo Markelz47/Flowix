@@ -52,7 +52,7 @@ exports.handler = async function(event) {
             resolve({
               statusCode: res.statusCode,
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ error: parsed.error?.message || 'Error en la API' })
+              body: JSON.stringify({ error: JSON.stringify(parsed) })
             });
           } else {
             resolve({
