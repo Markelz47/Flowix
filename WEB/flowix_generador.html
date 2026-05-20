@@ -668,8 +668,6 @@ INSTRUCCIONES CRÍTICAS:
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Error generando la rutina');
-    lastRutina = ;
-    if (!res.ok) throw new Error(data.error || 'Error generando la rutina');
     lastRutina = data.resultado;
     document.getElementById('resultContent').textContent = lastRutina;
     document.getElementById('resultCard').classList.add('show');
