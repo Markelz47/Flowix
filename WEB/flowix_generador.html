@@ -661,7 +661,7 @@ INSTRUCCIONES CRÍTICAS:
   document.getElementById('loadArea').classList.add('show');
 
   try {
-    const res = await fetch('/.netlify/functions/generar', {
+    const res = await fetch('https://flowix-api.markel-zarragoitia47.workers.dev/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt })
