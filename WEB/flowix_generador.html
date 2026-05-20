@@ -670,7 +670,7 @@ INSTRUCCIONES CRÍTICAS:
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Error generando la rutina');
-    const texto = data.resultado;
+    console.log('Respuesta Worker:', JSON.stringify(data)); const texto = data.resultado || data.text || data.content || JSON.stringify(data);
     let rutina;
     try {
       const clean = texto.replace(/```json|```/g, '').trim();
