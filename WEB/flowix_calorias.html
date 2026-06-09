@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowix — Calculadora de Calorías</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#00C896;--gd:#008F6B;--gx:rgba(0,200,150,.1);--gb:rgba(0,200,150,.18);
+  --b:#0EA5E9;--bx:rgba(14,165,233,.1);
+  --o:#F59E0B;--ox:rgba(245,158,11,.1);
+  --r:#EF4444;--rx:rgba(239,68,68,.1);
+  --bg:#05080B;--bg2:#080D12;--s1:#0C1520;--s2:#101C28;--s3:#152030;
+  --t1:#EDF2F8;--t2:#7A94AE;--t3:#415A72;
+  --bd:rgba(255,255,255,.055);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;font-size:14px}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--s3);border-radius:4px}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:rgba(5,8,11,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+.logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--g);letter-spacing:-.5px;text-decoration:none}
+.back-btn{display:flex;align-items:center;gap:7px;padding:8px 16px;border:1px solid var(--bd);border-radius:8px;color:var(--t2);font-size:13px;cursor:pointer;background:transparent;transition:all .2s;text-decoration:none}
+.back-btn:hover{border-color:var(--g);color:var(--g)}
+
+/* LAYOUT */
+.page{max-width:900px;margin:0 auto;padding:32px 20px 60px}
+.page-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--t1);margin-bottom:4px}
+.page-sub{color:var(--t2);font-size:14px;margin-bottom:32px}
+
+/* CARD */
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:24px;margin-bottom:20px}
+.card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.card-title span{font-size:16px}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+/* FIELDS */
+.field{display:flex;flex-direction:column;gap:6px}
+label{font-size:12px;color:var(--t2);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+input,select{background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:11px 14px;color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;transition:border-color .2s;outline:none;width:100%}
+input:focus,select:focus{border-color:var(--g)}
+input::placeholder{color:var(--t3)}
+select option{background:var(--s2)}
+
+/* TOGGLE SEXO */
+.sex-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sex-btn{padding:11px;border:1.5px solid var(--bd);border-radius:9px;background:var(--s2);color:var(--t2);font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:all .2s;font-family:'DM Sans',sans-serif}
+.sex-btn.active{border-color:var(--g);background:var(--gx);color:var(--g)}
+
+/* ACTIVIDAD */
+.act-grid{display:grid;grid-template-columns:1fr;gap:8px}
+.act-btn{padding:13px 16px;border:1.5px solid var(--bd);border-radius:10px;background:var(--s2);color:var(--t2);font-size:13px;cursor:pointer;text-align:left;transition:all .2s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:space-between}
+.act-btn:hover{border-color:rgba(0,200,150,.3);color:var(--t1)}
+.act-btn.active{border-color:var(--g);background:var(--gx);color:var(--t1)}
+.act-btn .act-name{font-weight:600;font-size:13px}
+.act-btn .act-desc{font-size:11px;color:var(--t3);margin-top:2px}
+.act-btn .act-left{display:flex;flex-direction:column}
+.act-btn .act-mult{font-size:11px;color:var(--g);font-weight:700;white-space:nowrap}
+.act-btn.active .act-desc{color:var(--t2)}
+
+/* OBJETIVO */
+.obj-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.obj-btn{padding:14px 10px;border:1.5px solid var(--bd);border-radius:10px;background:var(--s2);color:var(--t2);font-size:12px;cursor:pointer;text-align:center;transition:all .2s;font-family:'DM Sans',sans-serif}
+.obj-btn:hover{border-color:rgba(0,200,150,.3)}
+.obj-btn.active-deficit{border-color:var(--r);background:var(--rx);color:var(--t1)}
+.obj-btn.active-mant{border-color:var(--g);background:var(--gx);color:var(--t1)}
+.obj-btn.active-super{border-color:var(--b);background:var(--bx);color:var(--t1)}
+.obj-icon{font-size:22px;margin-bottom:6px}
+.obj-name{font-weight:700;font-size:13px}
+.obj-sub{font-size:11px;color:var(--t3);margin-top:3px}
+
+/* AJUSTE CALORICO */
+.ajuste-wrap{margin-top:14px;display:none}
+.ajuste-wrap.show{display:block}
+.ajuste-slider{width:100%;accent-color:var(--g);margin:8px 0}
+.ajuste-val{font-size:22px;font-weight:700;color:var(--g);text-align:center;margin:4px 0}
+.ajuste-label{font-size:12px;color:var(--t2);text-align:center}
+
+/* MACROS RATIO */
+.macro-ratio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:4px}
+.mratio-btn{padding:10px;border:1.5px solid var(--bd);border-radius:9px;background:var(--s2);color:var(--t2);font-size:12px;cursor:pointer;text-align:center;transition:all .2s;font-family:'DM Sans',sans-serif}
+.mratio-btn.active{border-color:var(--g);background:var(--gx);color:var(--t1)}
+.mratio-name{font-weight:700;font-size:12px}
+.mratio-vals{font-size:10px;color:var(--t3);margin-top:3px}
+
+/* BTN CALCULAR */
+.btn-calc{width:100%;padding:16px;background:var(--g);border:none;border-radius:12px;color:#000;font-size:15px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;letter-spacing:.5px;transition:all .2s;margin-top:4px}
+.btn-calc:hover{background:var(--gd);transform:translateY(-1px)}
+.btn-calc:active{transform:translateY(0)}
+
+/* RESULTS */
+.result-card{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:28px;margin-top:24px;display:none;animation:fadeup .4s ease}
+.result-card.show{display:block}
+@keyframes fadeup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:gap}
+.result-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--t1)}
+.result-actions{display:flex;gap:8px;flex-wrap:wrap}
+.ra{padding:8px 16px;border:1px solid var(--bd);border-radius:8px;background:transparent;color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.ra:hover{border-color:var(--g);color:var(--g)}
+.ra.green{background:var(--gx);border-color:var(--g);color:var(--g)}
+
+/* CALS PRINCIPALES */
+.cals-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+.cal-box{background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:18px;text-align:center}
+.cal-box.main{background:var(--gx);border-color:var(--g)}
+.cal-box.deficit{background:var(--rx);border-color:var(--r)}
+.cal-box.super{background:var(--bx);border-color:var(--b)}
+.cal-label{font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600}
+.cal-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--t1)}
+.cal-val span{font-size:13px;font-weight:400;color:var(--t2)}
+.cal-sub{font-size:11px;color:var(--t3);margin-top:4px}
+
+/* MACROS */
+.macros-section{margin-top:4px}
+.macros-title{font-size:12px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:14px}
+.macros-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.macro-box{background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:18px;text-align:center}
+.macro-box.prot{border-top:3px solid var(--g)}
+.macro-box.carb{border-top:3px solid var(--b)}
+.macro-box.fat{border-top:3px solid var(--o)}
+.macro-name{font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:6px}
+.macro-g{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--t1)}
+.macro-g span{font-size:13px;font-weight:400;color:var(--t2)}
+.macro-kcal{font-size:11px;color:var(--t3);margin-top:4px}
+.macro-pct{font-size:12px;color:var(--t2);margin-top:2px;font-weight:600}
+
+/* MACRO BAR */
+.macro-bar{display:flex;height:8px;border-radius:20px;overflow:hidden;margin:20px 0 6px;gap:2px}
+.bar-prot{background:var(--g);border-radius:20px 0 0 20px;transition:width .6s ease}
+.bar-carb{background:var(--b);transition:width .6s ease}
+.bar-fat{background:var(--o);border-radius:0 20px 20px 0;transition:width .6s ease}
+.bar-legend{display:flex;gap:16px;justify-content:center;font-size:11px;color:var(--t2)}
+.bar-legend span{display:flex;align-items:center;gap:5px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* TMB INFO */
+.tmb-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.tmb-box{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.tmb-label{font-size:12px;color:var(--t2)}
+.tmb-val{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--t1)}
+
+/* NOTAS */
+.notas-box{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-top:14px;font-size:13px;color:var(--t2);line-height:1.7}
+.notas-box strong{color:var(--g)}
+
+/* RESET BTN */
+.btn-reset{width:100%;padding:12px;background:transparent;border:1px solid var(--bd);border-radius:10px;color:var(--t2);font-size:13px;font-weight:600;cursor:pointer;margin-top:14px;transition:all .2s;font-family:'DM Sans',sans-serif}
+.btn-reset:hover{border-color:var(--r);color:var(--r)}
+
+/* DIET PLAN */
+.diet-day{background:var(--s2);border:1px solid var(--bd);border-radius:12px;margin-bottom:16px;overflow:hidden}
+.diet-day-header{background:linear-gradient(135deg,var(--s3),var(--s2));padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd)}
+.diet-day-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--t1)}
+.diet-day-macros{font-size:11px;color:var(--t2);display:flex;gap:12px}
+.diet-day-macros span{color:var(--t1);font-weight:600}
+.diet-meal{padding:16px 18px;border-bottom:1px solid var(--bd)}
+.diet-meal-time{font-size:11px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.diet-meal-name{font-size:11px;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.diet-recipe-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--t1);margin-bottom:10px;line-height:1.3}
+.diet-prep{font-size:12px;color:var(--t2);line-height:1.6;background:var(--s1);border-left:3px solid var(--g);padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:12px;font-style:italic}
+.diet-ingredients-title{font-size:11px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.diet-meal:last-child{border-bottom:none}
+.diet-meal-name{font-size:12px;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.diet-food-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.diet-food-row:last-child{border-bottom:none}
+.diet-food-name{font-size:13px;color:var(--t1)}
+.diet-food-detail{font-size:11px;color:var(--t2);text-align:right}
+.diet-meal-total{margin-top:8px;padding:8px 10px;background:var(--s1);border-radius:6px;font-size:11px;color:var(--t2);display:flex;gap:12px}
+.diet-meal-total span{color:var(--g);font-weight:600}
+.diet-shopping{background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-top:4px}
+.diet-shopping-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--o);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.shop-category{margin-bottom:14px}
+.shop-cat-name{font-size:11px;color:var(--t2);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.shop-item{font-size:13px;color:var(--t1);padding:3px 0;display:flex;align-items:center;gap:8px}
+.shop-item::before{content:"•";color:var(--g)}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* FOOD CHIPS */
+.food-chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:7px 14px;border:1.5px solid var(--bd);border-radius:20px;background:var(--s2);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;user-select:none}
+.chip:hover{border-color:rgba(0,200,150,.4);color:var(--t1)}
+.chip.active{border-color:var(--g);background:var(--gx);color:var(--g);font-weight:600}
+
+/* DIET RESULT CARDS */
+.diet-day-wrap{margin-bottom:24px}
+.diet-day-label{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.diet-day-label::after{content:'';flex:1;height:1px;background:var(--bd)}
+.diet-meal-card{background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:18px 20px;margin-bottom:10px;transition:border-color .2s}
+.diet-meal-card:hover{border-color:rgba(0,200,150,.2)}
+.diet-meal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:12px}
+.diet-meal-left{display:flex;align-items:center;gap:12px}
+.diet-meal-emoji{font-size:28px;line-height:1}
+.diet-meal-info{}
+.diet-meal-time{font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.diet-meal-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--t1);line-height:1.3}
+.diet-meal-macros{display:flex;gap:6px;flex-wrap:wrap}
+.macro-pill{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.macro-pill.kcal{background:rgba(255,255,255,.06);color:var(--t2)}
+.macro-pill.prot{background:rgba(0,200,150,.1);color:var(--g)}
+.macro-pill.carb{background:rgba(14,165,233,.1);color:var(--b)}
+.macro-pill.gras{background:rgba(245,158,11,.1);color:var(--o)}
+.diet-recipe-desc{font-size:13px;color:var(--t2);line-height:1.7;margin-top:10px;padding-top:10px;border-top:1px solid var(--bd)}
+.diet-recipe-desc strong{color:var(--t1)}
+.diet-day-total{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;background:var(--s1);border-radius:10px;margin-top:6px;margin-bottom:6px}
+.diet-total-item{font-size:12px;color:var(--t2)}
+.diet-total-item span{color:var(--t1);font-weight:700}
+
+/* SHOPPING LIST */
+.diet-shopping-wrap{margin-top:24px;padding-top:20px;border-top:1px solid var(--bd)}
+.diet-shopping-header{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--o);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.shop-cat-card{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px}
+.shop-cat-title{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.shop-item{font-size:12px;color:var(--t1);padding:3px 0;display:flex;align-items:center;gap:7px}
+.shop-item::before{content:"·";color:var(--g);font-weight:700}
+
+@keyframes pulse{0%,100%{opacity:.4;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
+
+@media(max-width:640px){
+  .g2,.g3,.cals-row,.macros-grid,.tmb-row,.obj-grid,.macro-ratio{grid-template-columns:1fr}
+  .page{padding:20px 14px 40px}
+}
+</style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="flowix_dashboard.html">Flowix</a>
+  <a class="back-btn" href="flowix_dashboard.html">← Volver al dashboard</a>
+</nav>
+
+<div class="page">
+  <div class="page-title">🔥 Calculadora de Calorías</div>
+  <div class="page-sub">Fórmula Harris-Benedict — Calcula el gasto energético y macros de tu cliente</div>
+
+  <!-- DATOS PERSONALES -->
+  <div class="card">
+    <div class="card-title"><span>👤</span> Datos del cliente</div>
+    <div class="g2" style="margin-bottom:14px">
+      <div class="field">
+        <label>Nombre del cliente</label>
+        <input type="text" id="f-nombre" placeholder="Ej: Carlos López">
+      </div>
+      <div class="field">
+        <label>Sexo</label>
+        <div class="sex-toggle">
+          <div class="sex-btn active" onclick="setSexo('hombre',this)">♂ Hombre</div>
+          <div class="sex-btn" onclick="setSexo('mujer',this)">♀ Mujer</div>
+        </div>
+      </div>
+    </div>
+    <div class="g3">
+      <div class="field">
+        <label>Edad (años)</label>
+        <input type="number" id="f-edad" placeholder="25" min="10" max="100">
+      </div>
+      <div class="field">
+        <label>Peso (kg)</label>
+        <input type="number" id="f-peso" placeholder="75" min="30" max="300" step="0.1">
+      </div>
+      <div class="field">
+        <label>Altura (cm)</label>
+        <input type="number" id="f-altura" placeholder="175" min="100" max="250">
+      </div>
+    </div>
+  </div>
+
+  <!-- NIVEL DE ACTIVIDAD -->
+  <div class="card">
+    <div class="card-title"><span>⚡</span> Nivel de actividad física</div>
+    <div class="act-grid">
+      <div class="act-btn" onclick="setActividad(1.2,this)">
+        <div class="act-left">
+          <div class="act-name">Sedentario</div>
+          <div class="act-desc">Trabajo de oficina, poco o ningún ejercicio</div>
+        </div>
+        <div class="act-mult">×1.2</div>
+      </div>
+      <div class="act-btn" onclick="setActividad(1.375,this)">
+        <div class="act-left">
+          <div class="act-name">Actividad ligera</div>
+          <div class="act-desc">Ejercicio suave 1-3 días por semana</div>
+        </div>
+        <div class="act-mult">×1.375</div>
+      </div>
+      <div class="act-btn active" onclick="setActividad(1.55,this)">
+        <div class="act-left">
+          <div class="act-name">Actividad moderada</div>
+          <div class="act-desc">Ejercicio moderado 3-5 días por semana</div>
+        </div>
+        <div class="act-mult">×1.55</div>
+      </div>
+      <div class="act-btn" onclick="setActividad(1.725,this)">
+        <div class="act-left">
+          <div class="act-name">Actividad alta</div>
+          <div class="act-desc">Ejercicio intenso 6-7 días por semana</div>
+        </div>
+        <div class="act-mult">×1.725</div>
+      </div>
+      <div class="act-btn" onclick="setActividad(1.9,this)">
+        <div class="act-left">
+          <div class="act-name">Muy activo</div>
+          <div class="act-desc">Trabajo físico intenso + ejercicio diario</div>
+        </div>
+        <div class="act-mult">×1.9</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OBJETIVO -->
+  <div class="card">
+    <div class="card-title"><span>🎯</span> Objetivo del cliente</div>
+    <div class="obj-grid">
+      <div class="obj-btn" onclick="setObjetivo('deficit',this)">
+        <div class="obj-icon">📉</div>
+        <div class="obj-name">Déficit</div>
+        <div class="obj-sub">Perder grasa</div>
+      </div>
+      <div class="obj-btn active-mant" onclick="setObjetivo('mantenimiento',this)">
+        <div class="obj-icon">⚖️</div>
+        <div class="obj-name">Mantenimiento</div>
+        <div class="obj-sub">Mantener peso</div>
+      </div>
+      <div class="obj-btn" onclick="setObjetivo('superavit',this)">
+        <div class="obj-icon">📈</div>
+        <div class="obj-name">Superávit</div>
+        <div class="obj-sub">Ganar músculo</div>
+      </div>
+    </div>
+    <div class="ajuste-wrap" id="ajuste-wrap">
+      <div style="margin-top:14px;padding:16px;background:var(--s2);border-radius:10px;border:1px solid var(--bd)">
+        <label style="margin-bottom:8px;display:block">Ajuste calórico</label>
+        <input type="range" class="ajuste-slider" id="ajuste-slider" min="100" max="700" step="50" value="300" oninput="updateAjuste()">
+        <div class="ajuste-val" id="ajuste-val">−300 kcal</div>
+        <div class="ajuste-label" id="ajuste-label">Déficit moderado — pérdida de ~0.3 kg/semana</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISTRIBUCIÓN DE MACROS -->
+  <div class="card">
+    <div class="card-title"><span>🥩</span> Distribución de macronutrientes</div>
+    <div class="macro-ratio">
+      <div class="mratio-btn active" onclick="setMacroRatio('alto_prot',this)">
+        <div class="mratio-name">Alto en proteína</div>
+        <div class="mratio-vals">40% Prot · 35% Carb · 25% Gras</div>
+      </div>
+      <div class="mratio-btn" onclick="setMacroRatio('equilibrado',this)">
+        <div class="mratio-name">Equilibrado</div>
+        <div class="mratio-vals">30% Prot · 40% Carb · 30% Gras</div>
+      </div>
+      <div class="mratio-btn" onclick="setMacroRatio('bajo_carb',this)">
+        <div class="mratio-name">Bajo en carbos</div>
+        <div class="mratio-vals">35% Prot · 25% Carb · 40% Gras</div>
+      </div>
+      <div class="mratio-btn" onclick="setMacroRatio('cetogenico',this)">
+        <div class="mratio-name">Cetogénico</div>
+        <div class="mratio-vals">30% Prot · 5% Carb · 65% Gras</div>
+      </div>
+      <div class="mratio-btn" onclick="setMacroRatio('volumen',this)">
+        <div class="mratio-name">Volumen</div>
+        <div class="mratio-vals">25% Prot · 55% Carb · 20% Gras</div>
+      </div>
+      <div class="mratio-btn" onclick="setMacroRatio('personalizado',this)">
+        <div class="mratio-name">Personalizado</div>
+        <div class="mratio-vals">Definir % manualmente</div>
+      </div>
+    </div>
+    <div id="custom-macros" style="display:none;margin-top:14px">
+      <div class="g3">
+        <div class="field">
+          <label>% Proteínas</label>
+          <input type="number" id="custom-p" placeholder="30" min="10" max="60" value="30" oninput="validarCustomMacros()">
+        </div>
+        <div class="field">
+          <label>% Carbohidratos</label>
+          <input type="number" id="custom-c" placeholder="40" min="5" max="70" value="40" oninput="validarCustomMacros()">
+        </div>
+        <div class="field">
+          <label>% Grasas</label>
+          <input type="number" id="custom-g" placeholder="30" min="10" max="60" value="30" oninput="validarCustomMacros()">
+        </div>
+      </div>
+      <div id="custom-warning" style="font-size:12px;color:var(--r);margin-top:8px;display:none">⚠️ Los porcentajes deben sumar 100%</div>
+    </div>
+  </div>
+
+  <!-- BOTÓN CALCULAR -->
+  <button class="btn-calc" onclick="calcular()">✨ Calcular calorías y macros</button>
+
+  <!-- RESULTADOS -->
+  <div class="result-card" id="result-card">
+    <div class="result-header">
+      <div class="result-title">✅ Resultado para <span id="res-nombre" style="color:var(--g)">el cliente</span></div>
+      <div class="result-actions">
+        <button class="ra green" onclick="copiarResultado()">📋 Copiar</button>
+        <button class="ra" onclick="enviarWA()" style="background:rgba(37,211,102,.1);border-color:#25D366;color:#25D366">📱 WhatsApp</button>
+      </div>
+    </div>
+
+    <!-- CALORÍAS PRINCIPALES -->
+    <div class="cals-row">
+      <div class="cal-box">
+        <div class="cal-label">Metabolismo basal (TMB)</div>
+        <div class="cal-val" id="res-tmb">— <span>kcal</span></div>
+        <div class="cal-sub">Calorías en reposo absoluto</div>
+      </div>
+      <div class="cal-box">
+        <div class="cal-label">Mantenimiento (TDEE)</div>
+        <div class="cal-val" id="res-tdee">— <span>kcal</span></div>
+        <div class="cal-sub">Con tu nivel de actividad</div>
+      </div>
+      <div class="cal-box main" id="res-obj-box">
+        <div class="cal-label" id="res-obj-label">Calorías objetivo</div>
+        <div class="cal-val" id="res-obj">— <span>kcal</span></div>
+        <div class="cal-sub" id="res-obj-sub">Según tu objetivo</div>
+      </div>
+    </div>
+
+    <!-- BARRA DE MACROS -->
+    <div class="macros-section">
+      <div class="macros-title">Distribución de macronutrientes</div>
+      <div class="macro-bar">
+        <div class="bar-prot" id="bar-prot" style="width:40%"></div>
+        <div class="bar-carb" id="bar-carb" style="width:35%"></div>
+        <div class="bar-fat"  id="bar-fat"  style="width:25%"></div>
+      </div>
+      <div class="bar-legend">
+        <span><div class="dot" style="background:var(--g)"></div> Proteínas</span>
+        <span><div class="dot" style="background:var(--b)"></div> Carbohidratos</span>
+        <span><div class="dot" style="background:var(--o)"></div> Grasas</span>
+      </div>
+      <div class="macros-grid" style="margin-top:16px">
+        <div class="macro-box prot">
+          <div class="macro-name">Proteínas</div>
+          <div class="macro-g" id="res-prot">— <span>g</span></div>
+          <div class="macro-pct" id="res-prot-pct">—%</div>
+          <div class="macro-kcal" id="res-prot-kcal">— kcal</div>
+        </div>
+        <div class="macro-box carb">
+          <div class="macro-name">Carbohidratos</div>
+          <div class="macro-g" id="res-carb">— <span>g</span></div>
+          <div class="macro-pct" id="res-carb-pct">—%</div>
+          <div class="macro-kcal" id="res-carb-kcal">— kcal</div>
+        </div>
+        <div class="macro-box fat">
+          <div class="macro-name">Grasas</div>
+          <div class="macro-g" id="res-fat">— <span>g</span></div>
+          <div class="macro-pct" id="res-fat-pct">—%</div>
+          <div class="macro-kcal" id="res-fat-kcal">— kcal</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TMB INFO -->
+    <div class="tmb-row">
+      <div class="tmb-box">
+        <div class="tmb-label">Proteína por kg de peso</div>
+        <div class="tmb-val" id="res-prot-kg">— g/kg</div>
+      </div>
+      <div class="tmb-box">
+        <div class="tmb-label">Factor de actividad aplicado</div>
+        <div class="tmb-val" id="res-factor">—</div>
+      </div>
+    </div>
+
+    <!-- NOTAS -->
+    <div class="notas-box" id="res-notas"></div>
+
+    <button class="btn-reset" onclick="resetCalc()">↩ Nueva calculación</button>
+
+    <!-- DIET GENERATOR -->
+    <div id="diet-gen-section" style="margin-top:32px;display:none">
+      <div style="border-top:1px solid var(--bd);padding-top:28px">
+
+        <!-- Header -->
+        <div style="margin-bottom:24px">
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--t1);margin-bottom:4px">🥗 Generar plan de dieta</div>
+          <div style="font-size:13px;color:var(--t2)">Personaliza los alimentos y genera un plan con recetas reales</div>
+        </div>
+
+        <!-- PROTEÍNAS -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:11px;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">🥩 Proteínas preferidas</div>
+          <div class="food-chips" id="chips-prot">
+            <div class="chip active" onclick="toggleChip(this)">Pollo</div>
+            <div class="chip active" onclick="toggleChip(this)">Atún</div>
+            <div class="chip active" onclick="toggleChip(this)">Huevos</div>
+            <div class="chip" onclick="toggleChip(this)">Salmón</div>
+            <div class="chip" onclick="toggleChip(this)">Ternera</div>
+            <div class="chip" onclick="toggleChip(this)">Pavo</div>
+            <div class="chip" onclick="toggleChip(this)">Sardinas</div>
+            <div class="chip" onclick="toggleChip(this)">Queso cottage</div>
+            <div class="chip" onclick="toggleChip(this)">Yogur griego</div>
+            <div class="chip" onclick="toggleChip(this)">Tofu</div>
+          </div>
+        </div>
+
+        <!-- CARBOHIDRATOS -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:11px;font-weight:700;color:var(--b);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">🍚 Carbohidratos preferidos</div>
+          <div class="food-chips" id="chips-carb">
+            <div class="chip active" onclick="toggleChip(this)">Avena</div>
+            <div class="chip active" onclick="toggleChip(this)">Arroz integral</div>
+            <div class="chip active" onclick="toggleChip(this)">Patata</div>
+            <div class="chip" onclick="toggleChip(this)">Pasta integral</div>
+            <div class="chip" onclick="toggleChip(this)">Pan integral</div>
+            <div class="chip" onclick="toggleChip(this)">Boniato</div>
+            <div class="chip" onclick="toggleChip(this)">Quinoa</div>
+            <div class="chip" onclick="toggleChip(this)">Plátano</div>
+            <div class="chip" onclick="toggleChip(this)">Legumbres</div>
+            <div class="chip" onclick="toggleChip(this)">Fruta</div>
+          </div>
+        </div>
+
+        <!-- GRASAS -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:11px;font-weight:700;color:var(--o);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">🥑 Grasas saludables</div>
+          <div class="food-chips" id="chips-gras">
+            <div class="chip active" onclick="toggleChip(this)">Aguacate</div>
+            <div class="chip active" onclick="toggleChip(this)">Aceite oliva</div>
+            <div class="chip" onclick="toggleChip(this)">Frutos secos</div>
+            <div class="chip" onclick="toggleChip(this)">Mantequilla cacahuete</div>
+            <div class="chip" onclick="toggleChip(this)">Semillas</div>
+            <div class="chip" onclick="toggleChip(this)">Queso</div>
+          </div>
+        </div>
+
+        <!-- VERDURAS -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:11px;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">🥦 Verduras y hortalizas</div>
+          <div class="food-chips" id="chips-verd">
+            <div class="chip active" onclick="toggleChip(this)">Brócoli</div>
+            <div class="chip active" onclick="toggleChip(this)">Espinacas</div>
+            <div class="chip active" onclick="toggleChip(this)">Tomate</div>
+            <div class="chip" onclick="toggleChip(this)">Pepino</div>
+            <div class="chip" onclick="toggleChip(this)">Calabacín</div>
+            <div class="chip" onclick="toggleChip(this)">Pimiento</div>
+            <div class="chip" onclick="toggleChip(this)">Lechuga</div>
+            <div class="chip" onclick="toggleChip(this)">Cebolla</div>
+            <div class="chip" onclick="toggleChip(this)">Ajo</div>
+            <div class="chip" onclick="toggleChip(this)">Zanahoria</div>
+          </div>
+        </div>
+
+        <!-- COMIDAS INDISPENSABLES -->
+        <div style="margin-bottom:20px;padding:20px;background:linear-gradient(135deg,rgba(0,200,150,.06),rgba(14,165,233,.06));border:1px solid rgba(0,200,150,.2);border-radius:14px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="font-size:22px">⭐</div>
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--t1)">Comidas indispensables</div>
+              <div style="font-size:12px;color:var(--t2);margin-top:1px">Platos o alimentos que no pueden faltar en el plan</div>
+            </div>
+          </div>
+          <textarea id="d-indispensables" placeholder="Ej: tortilla de patata los domingos, arroz con pollo siempre en la comida del mediodía, un batido de proteínas post-entreno..." style="min-height:75px;background:rgba(0,0,0,.2);border:1px solid var(--bd);border-radius:9px;padding:11px 14px;color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;width:100%;transition:border-color .2s" onfocus="this.style.borderColor='var(--g)'" onblur="this.style.borderColor='var(--bd)'"></textarea>
+        </div>
+
+        <!-- CONFIGURACIÓN -->
+        <div class="g2" style="margin-bottom:14px">
+          <div class="field">
+            <label>Tipo de dieta</label>
+            <select id="d-tipo">
+              <option value="normal">Sin restricciones</option>
+              <option value="mediterranea">Mediterránea</option>
+              <option value="sin_gluten">Sin gluten</option>
+              <option value="vegana">Vegana</option>
+              <option value="vegetariana">Vegetariana</option>
+              <option value="sin_lactosa">Sin lactosa</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Comidas al día</label>
+            <select id="d-comidas">
+              <option value="3">3 comidas</option>
+              <option value="4">4 comidas</option>
+              <option value="5" selected>5 comidas</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="g2" style="margin-bottom:14px">
+          <div class="field">
+            <label>Días del plan</label>
+            <select id="d-dias">
+              <option value="1">1 día tipo</option>
+              <option value="3">3 días</option>
+              <option value="5" selected>5 días</option>
+              <option value="7">7 días</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Estilo de cocina</label>
+            <select id="d-estilo">
+              <option value="simple">Simple y rápida</option>
+              <option value="elaborada">Elaborada</option>
+              <option value="meal_prep">Meal prep</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:20px">
+          <label>Alimentos a evitar / alergias</label>
+          <input type="text" id="d-evitar" placeholder="Ej: frutos secos, marisco, huevo...">
+        </div>
+
+        <button class="btn-calc" id="btn-gen-dieta" onclick="generarDieta()" style="background:linear-gradient(135deg,var(--g),#00a87a)">
+          🥗 Generar plan de dieta
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIET RESULT -->
+  <div class="result-card" id="diet-result-card" style="margin-top:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--t1)">🥗 Plan de dieta</div>
+        <div style="font-size:13px;color:var(--g);font-weight:600;margin-top:2px" id="diet-res-nombre"></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="ra" onclick="descargarDietaPDF()" style="background:rgba(192,57,43,.15);border-color:#c0392b;color:#e74c3c">📄 PDF</button>
+        <button class="ra" onclick="copiarDieta()" style="background:var(--gx);border-color:var(--g);color:var(--g)">📋 Copiar</button>
+        <button class="ra" onclick="enviarDietaWA()" style="background:rgba(37,211,102,.1);border-color:#25D366;color:#25D366">📱 WhatsApp</button>
+      </div>
+    </div>
+    <div id="diet-loading" style="text-align:center;padding:48px;display:none">
+      <div style="font-size:40px;margin-bottom:14px;animation:pulse 1.5s infinite">🥗</div>
+      <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px">Creando tu plan personalizado...</div>
+      <div style="font-size:13px;color:var(--t2)">Preparando recetas con tus alimentos favoritos</div>
+    </div>
+    <div id="diet-content"></div>
+  </div>
+
+</div>>
+
+<script>
+let sexo = 'hombre';
+let actividad = 1.55;
+let objetivo = 'mantenimiento';
+let ajuste = 300;
+let macroRatio = 'alto_prot';
+
+const macroPresets = {
+  alto_prot:   {p:40, c:35, g:25},
+  equilibrado: {p:30, c:40, g:30},
+  bajo_carb:   {p:35, c:25, g:40},
+  cetogenico:  {p:30, c:5,  g:65},
+  volumen:     {p:25, c:55, g:20},
+  personalizado: null
+};
+
+function setSexo(val, el) {
+  sexo = val;
+  document.querySelectorAll('.sex-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setActividad(val, el) {
+  actividad = val;
+  document.querySelectorAll('.act-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setObjetivo(val, el) {
+  objetivo = val;
+  document.querySelectorAll('.obj-btn').forEach(b => {
+    b.classList.remove('active-deficit','active-mant','active-super');
+  });
+  if(val==='deficit') el.classList.add('active-deficit');
+  else if(val==='mantenimiento') el.classList.add('active-mant');
+  else el.classList.add('active-super');
+
+  const wrap = document.getElementById('ajuste-wrap');
+  if(val==='mantenimiento') {
+    wrap.classList.remove('show');
+  } else {
+    wrap.classList.add('show');
+    updateAjuste();
+  }
+}
+
+function updateAjuste() {
+  ajuste = parseInt(document.getElementById('ajuste-slider').value);
+  const sign = objetivo==='deficit' ? '−' : '+';
+  document.getElementById('ajuste-val').textContent = `${sign}${ajuste} kcal`;
+  
+  let label = '';
+  if(objetivo==='deficit') {
+    const kgSem = (ajuste * 7 / 7700).toFixed(2);
+    label = ajuste <= 200 ? 'Déficit suave — ideal para preservar músculo' :
+            ajuste <= 400 ? `Déficit moderado — pérdida de ~${kgSem} kg/semana` :
+            `Déficit agresivo — pérdida de ~${kgSem} kg/semana`;
+  } else {
+    label = ajuste <= 200 ? 'Superávit limpio — mínima ganancia de grasa' :
+            ajuste <= 400 ? 'Superávit moderado — buen balance músculo/grasa' :
+            'Superávit agresivo — ganancia rápida';
+  }
+  document.getElementById('ajuste-label').textContent = label;
+}
+
+function setMacroRatio(val, el) {
+  macroRatio = val;
+  document.querySelectorAll('.mratio-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('custom-macros').style.display = val==='personalizado' ? 'block' : 'none';
+}
+
+function validarCustomMacros() {
+  const p = parseInt(document.getElementById('custom-p').value)||0;
+  const c = parseInt(document.getElementById('custom-c').value)||0;
+  const g = parseInt(document.getElementById('custom-g').value)||0;
+  const warn = document.getElementById('custom-warning');
+  warn.style.display = (p+c+g !== 100) ? 'block' : 'none';
+}
+
+function calcular() {
+  const nombre = document.getElementById('f-nombre').value || 'el cliente';
+  const edad   = parseInt(document.getElementById('f-edad').value);
+  const peso   = parseFloat(document.getElementById('f-peso').value);
+  const altura = parseFloat(document.getElementById('f-altura').value);
+
+  if(!edad || !peso || !altura) {
+    alert('Por favor rellena edad, peso y altura.');
+    return;
+  }
+
+  // Harris-Benedict revisada (Mifflin-St Jeor es más precisa pero usamos HB clásica revisada)
+  let tmb;
+  if(sexo === 'hombre') {
+    tmb = 88.362 + (13.397 * peso) + (4.799 * altura) - (5.677 * edad);
+  } else {
+    tmb = 447.593 + (9.247 * peso) + (3.098 * altura) - (4.330 * edad);
+  }
+
+  const tdee = tmb * actividad;
+
+  let calObj;
+  if(objetivo === 'mantenimiento') {
+    calObj = tdee;
+  } else if(objetivo === 'deficit') {
+    calObj = tdee - ajuste;
+  } else {
+    calObj = tdee + ajuste;
+  }
+
+  // Macros
+  let ratios;
+  if(macroRatio === 'personalizado') {
+    const p = parseInt(document.getElementById('custom-p').value)||30;
+    const c = parseInt(document.getElementById('custom-c').value)||40;
+    const g = parseInt(document.getElementById('custom-g').value)||30;
+    if(p+c+g !== 100) { alert('Los porcentajes deben sumar 100%.'); return; }
+    ratios = {p, c, g};
+  } else {
+    ratios = macroPresets[macroRatio];
+  }
+
+  const kcalProt = calObj * (ratios.p/100);
+  const kcalCarb = calObj * (ratios.c/100);
+  const kcalFat  = calObj * (ratios.g/100);
+  const gProt = Math.round(kcalProt / 4);
+  const gCarb = Math.round(kcalCarb / 4);
+  const gFat  = Math.round(kcalFat  / 9);
+  const protKg = (gProt / peso).toFixed(1);
+
+  // Render
+  document.getElementById('res-nombre').textContent = nombre;
+  document.getElementById('res-tmb').innerHTML  = `${Math.round(tmb)} <span>kcal</span>`;
+  document.getElementById('res-tdee').innerHTML = `${Math.round(tdee)} <span>kcal</span>`;
+  document.getElementById('res-obj').innerHTML  = `${Math.round(calObj)} <span>kcal</span>`;
+
+  const objBox = document.getElementById('res-obj-box');
+  objBox.className = 'cal-box';
+  if(objetivo==='deficit') {
+    objBox.classList.add('deficit');
+    document.getElementById('res-obj-label').textContent = `Objetivo (−${ajuste} kcal)`;
+    document.getElementById('res-obj-sub').textContent = 'Déficit para perder grasa';
+  } else if(objetivo==='superavit') {
+    objBox.classList.add('super');
+    document.getElementById('res-obj-label').textContent = `Objetivo (+${ajuste} kcal)`;
+    document.getElementById('res-obj-sub').textContent = 'Superávit para ganar músculo';
+  } else {
+    objBox.classList.add('main');
+    document.getElementById('res-obj-label').textContent = 'Mantenimiento';
+    document.getElementById('res-obj-sub').textContent = 'Sin ajuste calórico';
+  }
+
+  document.getElementById('res-prot').innerHTML = `${gProt} <span>g</span>`;
+  document.getElementById('res-carb').innerHTML = `${gCarb} <span>g</span>`;
+  document.getElementById('res-fat').innerHTML  = `${gFat} <span>g</span>`;
+  document.getElementById('res-prot-pct').textContent = `${ratios.p}%`;
+  document.getElementById('res-carb-pct').textContent = `${ratios.c}%`;
+  document.getElementById('res-fat-pct').textContent  = `${ratios.g}%`;
+  document.getElementById('res-prot-kcal').textContent = `${Math.round(kcalProt)} kcal`;
+  document.getElementById('res-carb-kcal').textContent = `${Math.round(kcalCarb)} kcal`;
+  document.getElementById('res-fat-kcal').textContent  = `${Math.round(kcalFat)} kcal`;
+
+  document.getElementById('bar-prot').style.width = `${ratios.p}%`;
+  document.getElementById('bar-carb').style.width = `${ratios.c}%`;
+  document.getElementById('bar-fat').style.width  = `${ratios.g}%`;
+
+  document.getElementById('res-prot-kg').textContent = `${protKg} g/kg`;
+  document.getElementById('res-factor').textContent  = `×${actividad}`;
+
+  // Notas
+  let notas = `<strong>📊 Resumen para ${nombre}:</strong> TMB de ${Math.round(tmb)} kcal con ${Math.round(tdee)} kcal de mantenimiento. `;
+  notas += `Con ${Math.round(calObj)} kcal objetivo y ${gProt}g de proteína (${protKg}g/kg), `;
+  if(objetivo==='deficit') notas += `el déficit de ${ajuste} kcal facilitará una pérdida gradual de grasa preservando la masa muscular. `;
+  else if(objetivo==='superavit') notas += `el superávit de ${ajuste} kcal proporcionará energía extra para el desarrollo muscular. `;
+  else notas += `el objetivo de mantenimiento es ideal para recomposición corporal. `;
+  notas += `Ajusta las calorías cada 2-3 semanas según la evolución del peso y rendimiento.`;
+  document.getElementById('res-notas').innerHTML = notas;
+
+  document.getElementById('result-card').classList.add('show');
+  document.getElementById('diet-gen-section').style.display = 'block';
+  document.getElementById('result-card').scrollIntoView({behavior:'smooth'});
+}
+
+function copiarResultado() {
+  const nombre = document.getElementById('res-nombre').textContent;
+  const tmb    = document.getElementById('res-tmb').textContent.replace(' ','').trim();
+  const tdee   = document.getElementById('res-tdee').textContent.replace(' ','').trim();
+  const obj    = document.getElementById('res-obj').textContent.replace(' ','').trim();
+  const prot   = document.getElementById('res-prot').textContent.trim();
+  const carb   = document.getElementById('res-carb').textContent.trim();
+  const fat    = document.getElementById('res-fat').textContent.trim();
+  const protKg = document.getElementById('res-prot-kg').textContent;
+
+  const texto = `📊 CALORÍAS Y MACROS — ${nombre.toUpperCase()}\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `🔥 Metabolismo basal (TMB): ${tmb}\n` +
+    `⚡ Mantenimiento (TDEE): ${tdee}\n` +
+    `🎯 Calorías objetivo: ${obj}\n\n` +
+    `🥩 MACROS DIARIOS\n` +
+    `Proteínas: ${prot} (${protKg})\n` +
+    `Carbohidratos: ${carb}\n` +
+    `Grasas: ${fat}\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `Generado con Flowix`;
+
+  navigator.clipboard.writeText(texto);
+  const btn = document.querySelector('.ra.green');
+  btn.textContent = '✓ Copiado';
+  setTimeout(() => btn.textContent = '📋 Copiar', 2000);
+}
+
+function enviarWA() {
+  const nombre = document.getElementById('res-nombre').textContent;
+  const obj    = document.getElementById('res-obj').textContent.trim();
+  const prot   = document.getElementById('res-prot').textContent.trim();
+  const carb   = document.getElementById('res-carb').textContent.trim();
+  const fat    = document.getElementById('res-fat').textContent.trim();
+  const protKg = document.getElementById('res-prot-kg').textContent;
+
+  const msg = `Hola! Aquí tienes tus calorías y macros diarios 💪\n\n` +
+    `🎯 *Calorías objetivo: ${obj}*\n\n` +
+    `🥩 Proteínas: ${prot} (${protKg})\n` +
+    `🍚 Carbohidratos: ${carb}\n` +
+    `🥑 Grasas: ${fat}\n\n` +
+    `_Calculado con Flowix_`;
+
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+function resetCalc() {
+  document.getElementById('result-card').classList.remove('show');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ── DIET GENERATOR ──
+let lastDietText = null;
+let lastDietParams = {};
+
+function toggleChip(el) {
+  el.classList.toggle('active');
+}
+
+function getActiveChips(containerId) {
+  return Array.from(document.querySelectorAll('#' + containerId + ' .chip.active'))
+    .map(c => c.textContent.trim()).join(', ');
+}
+
+function generarDieta() {
+  const nombre  = document.getElementById('f-nombre').value || 'el cliente';
+  const calObj  = document.getElementById('res-obj').textContent.replace(/[^0-9]/g,'');
+  const gProt   = document.getElementById('res-prot').textContent.replace(/[^0-9]/g,'');
+  const gCarb   = document.getElementById('res-carb').textContent.replace(/[^0-9]/g,'');
+  const gFat    = document.getElementById('res-fat').textContent.replace(/[^0-9]/g,'');
+
+  if(!calObj) { alert('Primero calcula las calorías y macros.'); return; }
+
+  const prot    = getActiveChips('chips-prot') || 'pollo, huevos, atún';
+  const carb    = getActiveChips('chips-carb') || 'avena, arroz, patata';
+  const gras    = getActiveChips('chips-gras') || 'aceite oliva, aguacate';
+  const verd    = getActiveChips('chips-verd') || 'brócoli, espinacas, tomate';
+  const indis   = document.getElementById('d-indispensables').value;
+  const tipo    = document.getElementById('d-tipo').value;
+  const comidas = document.getElementById('d-comidas').value;
+  const dias    = document.getElementById('d-dias').value;
+  const estilo  = document.getElementById('d-estilo').value;
+  const evitar  = document.getElementById('d-evitar').value;
+
+  lastDietParams = {nombre, calObj, gProt, gCarb, gFat, dias, comidas};
+
+  const btn = document.getElementById('btn-gen-dieta');
+  btn.textContent = '⏳ Generando...';
+  btn.disabled = true;
+
+  document.getElementById('diet-result-card').classList.add('show');
+  document.getElementById('diet-loading').style.display = 'block';
+  document.getElementById('diet-content').innerHTML = '';
+  document.getElementById('diet-res-nombre').textContent = nombre + ' · ' + calObj + ' kcal/día';
+  document.getElementById('diet-result-card').scrollIntoView({behavior:'smooth'});
+
+  const estiloLabel = {simple:'recetas simples max 20min',elaborada:'recetas elaboradas',meal_prep:'meal prep cocinar en lote'}[estilo]||estilo;
+
+  const datos = {
+    nombre, calorias: calObj, prot: gProt, carb: gCarb, gras: gFat,
+    proteinas: prot, carbohidratos: carb, grasas: gras, verduras: verd,
+    indispensables: indis, tipoDieta: tipo, comidas, dias, estilo: estiloLabel,
+    evitar
+  };
+
+  fetch('https://flowix-api.markel-zarragoitia47.workers.dev/', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ tipo: 'dieta', datos })
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    const raw = data.resultado || data.text || '';
+    if(!raw) throw new Error('Respuesta vacía del servidor');
+    lastDietText = raw;
+    renderDieta(raw, nombre, calObj, gProt, gCarb, gFat);
+  })
+  .catch(e=>{
+    document.getElementById('diet-loading').style.display='none';
+    document.getElementById('diet-content').innerHTML=`<div style="color:var(--r);padding:20px;text-align:center;font-size:14px">❌ ${e.message}</div>`;
+  })
+  .finally(()=>{
+    btn.textContent='🥗 Generar plan de dieta';
+    btn.disabled=false;
+  });
+}
+
+function renderDieta(text, nombre, calorias, prot, carb, gras) {
+  document.getElementById('diet-loading').style.display='none';
+
+  // Parse text format:
+  // ==DIA 1==
+  // [DESAYUNO|8:00|emoji|Nombre receta|kcal|P|C|G]
+  // descripcion y preparacion
+  // ---
+  // ==LISTA DE COMPRA==
+  // CATEGORIA: item1, item2
+
+  const lines = text.split('
+');
+  let html = '';
+  let currentDay = '';
+  let inMeal = false;
+  let mealData = null;
+  let mealDesc = [];
+  let inShop = false;
+  let shopItems = {};
+  let currentCat = '';
+  let dayTotals = {kcal:0,prot:0,carb:0,gras:0};
+  let dayMealsHtml = '';
+
+  const flushMeal = () => {
+    if(!mealData) return;
+    const desc = mealDesc.join(' ').trim();
+    dayTotals.kcal += mealData.kcal;
+    dayTotals.prot += mealData.prot;
+    dayTotals.carb += mealData.carb;
+    dayTotals.gras += mealData.gras;
+    dayMealsHtml += `
+      <div class="diet-meal-card">
+        <div class="diet-meal-header">
+          <div class="diet-meal-left">
+            <div class="diet-meal-emoji">${mealData.emoji}</div>
+            <div class="diet-meal-info">
+              <div class="diet-meal-time">🕐 ${mealData.hora} — ${mealData.nombre}</div>
+              <div class="diet-meal-name">${mealData.receta}</div>
+            </div>
+          </div>
+          <div class="diet-meal-macros">
+            <div class="macro-pill kcal">${mealData.kcal} kcal</div>
+            <div class="macro-pill prot">P ${mealData.prot}g</div>
+            <div class="macro-pill carb">C ${mealData.carb}g</div>
+            <div class="macro-pill gras">G ${mealData.gras}g</div>
+          </div>
+        </div>
+        ${desc ? `<div class="diet-recipe-desc">${desc}</div>` : ''}
+      </div>`;
+    mealData = null;
+    mealDesc = [];
+    inMeal = false;
+  };
+
+  const flushDay = () => {
+    if(!currentDay || !dayMealsHtml) return;
+    html += `<div class="diet-day-wrap">
+      <div class="diet-day-label">${currentDay}</div>
+      ${dayMealsHtml}
+      <div class="diet-day-total">
+        <div class="diet-total-item">Total: <span>${dayTotals.kcal} kcal</span></div>
+        <div class="diet-total-item">Proteínas: <span>${dayTotals.prot}g</span></div>
+        <div class="diet-total-item">Carbohidratos: <span>${dayTotals.carb}g</span></div>
+        <div class="diet-total-item">Grasas: <span>${dayTotals.gras}g</span></div>
+      </div>
+    </div>`;
+    dayMealsHtml = '';
+    dayTotals = {kcal:0,prot:0,carb:0,gras:0};
+  };
+
+  lines.forEach(line => {
+    const l = line.trim();
+    if(!l) return;
+
+    // Day marker ==DIA 1==
+    if(l.startsWith('==') && l.endsWith('==') && !l.includes('LISTA') && !l.includes('COMPRA')) {
+      flushMeal();
+      flushDay();
+      inShop = false;
+      currentDay = l.replace(/==/g,'').trim();
+      return;
+    }
+
+    // Shopping list marker
+    if(l.includes('LISTA DE COMPRA') || l.includes('LISTA_COMPRA')) {
+      flushMeal();
+      flushDay();
+      inShop = true;
+      return;
+    }
+
+    // Meal data line [NOMBRE|HORA|EMOJI|RECETA|KCAL|P|C|G]
+    if(l.startsWith('[') && l.endsWith(']') && l.includes('|')) {
+      flushMeal();
+      const parts = l.slice(1,-1).split('|');
+      if(parts.length >= 8) {
+        mealData = {
+          nombre: parts[0].trim(),
+          hora:   parts[1].trim(),
+          emoji:  parts[2].trim(),
+          receta: parts[3].trim(),
+          kcal:   parseInt(parts[4])||0,
+          prot:   parseInt(parts[5])||0,
+          carb:   parseInt(parts[6])||0,
+          gras:   parseInt(parts[7])||0
+        };
+        inMeal = true;
+      }
+      return;
+    }
+
+    // Shopping category  CATEGORIA: item1, item2
+    if(inShop && l.includes(':') && !l.startsWith('-') && !l.startsWith('·')) {
+      const colonIdx = l.indexOf(':');
+      currentCat = l.substring(0, colonIdx).trim();
+      const itemsStr = l.substring(colonIdx+1).trim();
+      if(itemsStr) shopItems[currentCat] = itemsStr.split(',').map(i=>i.trim()).filter(Boolean);
+      return;
+    }
+
+    // Shopping items continuation
+    if(inShop && currentCat && (l.startsWith('-') || l.startsWith('·'))) {
+      if(!shopItems[currentCat]) shopItems[currentCat] = [];
+      shopItems[currentCat].push(l.replace(/^[-·]\s*/,'').trim());
+      return;
+    }
+
+    // Meal description text
+    if(inMeal && mealData) {
+      mealDesc.push(l);
+    }
+  });
+
+  flushMeal();
+  flushDay();
+
+  // Render shopping list
+  if(Object.keys(shopItems).length > 0) {
+    html += `<div class="diet-shopping-wrap">
+      <div class="diet-shopping-header">🛒 Lista de la compra</div>
+      <div class="shop-grid">`;
+    Object.entries(shopItems).forEach(([cat, items]) => {
+      html += `<div class="shop-cat-card">
+        <div class="shop-cat-title">${cat}</div>`;
+      items.forEach(item => { html += `<div class="shop-item">${item}</div>`; });
+      html += `</div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  if(!html) {
+    // Fallback: show raw text nicely
+    html = `<div style="background:var(--s2);border-radius:12px;padding:20px;font-size:13px;color:var(--t2);white-space:pre-wrap;line-height:1.8">${text}</div>`;
+  }
+
+  document.getElementById('diet-content').innerHTML = html;
+}
+
+function copiarDieta() {
+  if(!lastDietText) return;
+  navigator.clipboard.writeText(lastDietText);
+  alert('Plan copiado al portapapeles');
+}
+
+function enviarDietaWA() {
+  if(!lastDietText) return;
+  const p = lastDietParams;
+  const preview = lastDietText.substring(0, 800);
+  const msg = '🥗 *PLAN DE DIETA — ' + p.nombre + '*
+🎯 ' + p.calObj + ' kcal/día | P:' + p.gProt + 'g C:' + p.gCarb + 'g G:' + p.gFat + 'g
+
+' + preview + '
+
+_Generado con Flowix_';
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+function descargarDietaPDF() {
+  if(!lastDietText) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+  const p = lastDietParams;
+  const pageW = 210; const margin = 14; let y = 20;
+
+  const checkPage = (h) => { if(y+h > 282) { doc.addPage(); y = 20; drawH(); } };
+  const drawH = () => {
+    doc.setFillColor(0,200,150); doc.rect(0,0,pageW,13,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(255,255,255);
+    doc.text('FLOWIX — Plan de Dieta',margin,8.5);
+    doc.setFontSize(8); doc.text(p.nombre||'',pageW-margin,8.5,{align:'right'});
+  };
+
+  drawH();
+  y = 22;
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(20,20,30);
+  doc.text('Plan de Dieta — ' + (p.nombre||''), margin, y); y += 7;
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(100,100,100);
+  doc.text('Objetivo: ' + p.calObj + ' kcal/día  ·  P:' + p.gProt + 'g  C:' + p.gCarb + 'g  G:' + p.gFat + 'g', margin, y); y += 10;
+
+  const lines = lastDietText.split('
+');
+  lines.forEach(line => {
+    const l = line.trim();
+    if(!l) return;
+    checkPage(8);
+
+    if(l.startsWith('==') && l.endsWith('==')) {
+      y += 3;
+      doc.setFillColor(12,21,32); doc.rect(margin-2,y-5,pageW-margin*2+4,9,'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(0,200,150);
+      doc.text(l.replace(/==/g,'').trim(), margin, y); y += 7;
+    } else if(l.startsWith('[') && l.endsWith(']') && l.includes('|')) {
+      const parts = l.slice(1,-1).split('|');
+      if(parts.length >= 4) {
+        doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(20,20,30);
+        doc.text(parts[2].trim() + ' ' + parts[0].trim() + '  —  ' + parts[3].trim(), margin+2, y);
+        if(parts.length >= 8) {
+          doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(120,120,120);
+          doc.text(parts[4]+'kcal  P:'+parts[5]+'g C:'+parts[6]+'g G:'+parts[7]+'g', pageW-margin, y, {align:'right'});
+        }
+        y += 5;
+      }
+    } else if(l.includes('LISTA') || l.includes('COMPRA')) {
+      y += 3;
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(245,158,11);
+      doc.text('LISTA DE LA COMPRA', margin, y); y += 6;
+    } else if(l.includes(':') && !l.startsWith('-')) {
+      doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(0,150,100);
+      const colonIdx = l.indexOf(':');
+      doc.text(l.substring(0,colonIdx).toUpperCase(), margin+2, y); y += 4;
+      const items = l.substring(colonIdx+1).split(',');
+      items.forEach(item => {
+        checkPage(4);
+        doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(50,50,50);
+        doc.text('• ' + item.trim(), margin+4, y); y += 4;
+      });
+    } else {
+      const textLines = doc.splitTextToSize(l, pageW-margin*2);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(60,60,60);
+      textLines.forEach(tl => { checkPage(4.5); doc.text(tl, margin+2, y); y += 4.5; });
+    }
+  });
+
+  doc.save('Dieta_' + (p.nombre||'cliente').replace(/[^a-zA-Z0-9]/g,'_') + '_Flowix.pdf');
+}
+
+</script>
+</body>
+</html>
