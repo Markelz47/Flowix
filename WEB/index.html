@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowix — Rutinas, dietas y seguimiento generados con tu metodologia</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#00C896;--gd:#00B589;--gx:rgba(0,200,150,.10);
+  --c:#FF7A45;--cx:rgba(255,122,69,.12);
+  --bg:#05080B;--s1:#0C1520;--s2:#101C28;--s3:#172435;
+  --t1:#EDF2F8;--t2:#8098B2;--t3:#3F5A74;--bd:rgba(255,255,255,.06)
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;font-size:15px;scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--s3);border-radius:4px}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px 36px;background:rgba(5,8,11,.78);backdrop-filter:blur(16px);border-bottom:1px solid var(--bd)}
+.logo{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;color:var(--t1);letter-spacing:-.5px;text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo .dot{width:8px;height:8px;background:var(--g);border-radius:2px}
+.navlinks{display:flex;gap:36px;align-items:center}
+.navlinks a{color:var(--t2);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s;font-family:'JetBrains Mono',monospace;letter-spacing:.5px}
+.navlinks a:hover{color:var(--t1)}
+.btn-nav{padding:10px 22px;border-radius:8px;background:var(--g);color:#04342C;font-weight:700;font-size:13px;text-decoration:none;transition:all .2s;font-family:'JetBrains Mono',monospace}
+.btn-nav:hover{background:var(--gd)}
+
+/* HERO */
+.hero{max-width:1200px;margin:0 auto;padding:80px 36px 60px;display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:center}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--g);letter-spacing:3px;margin-bottom:22px;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:'';width:24px;height:1px;background:var(--g)}
+.hero h1{font-family:'Syne',sans-serif;font-size:54px;font-weight:800;line-height:1.12;letter-spacing:-1.5px}
+.hero h1 .hl{color:var(--g)}
+.hero p{font-size:17px;color:var(--t2);margin:24px 0 0;max-width:460px;line-height:1.7}
+.hero-cta{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap}
+.btn-primary{padding:15px 28px;border-radius:10px;background:var(--g);color:#04342C;font-weight:700;font-size:14px;text-decoration:none;transition:all .2s;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;display:inline-flex;align-items:center;gap:8px}
+.btn-primary:hover{background:var(--gd);transform:translateY(-1px)}
+.btn-secondary{padding:15px 28px;border-radius:10px;border:1px solid var(--bd);color:var(--t1);font-weight:500;font-size:14px;text-decoration:none;transition:all .2s;font-family:'DM Sans',sans-serif}
+.btn-secondary:hover{border-color:var(--t2)}
+
+/* READOUT CARD */
+.readout{background:var(--s1);border:1px solid var(--bd);border-radius:18px;overflow:hidden;position:relative}
+.readout-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--bd);background:var(--s2)}
+.readout-head .name{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t2);letter-spacing:2px}
+.readout-head .dots{display:flex;gap:6px}
+.readout-head .dots span{width:8px;height:8px;border-radius:50%;background:var(--t3)}
+.readout-body{padding:24px}
+.r-row{display:flex;justify-content:space-between;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--bd)}
+.r-row:last-of-type{border-bottom:none}
+.r-label{font-size:14px;color:var(--t1);font-weight:500}
+.r-sub{font-size:11px;color:var(--t3);margin-top:3px;font-family:'JetBrains Mono',monospace}
+.r-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--g)}
+.r-val span{font-size:11px;color:var(--t2);font-weight:400;margin-left:3px}
+.r-foot{display:flex;gap:18px;padding:16px 24px;background:var(--s2);border-top:1px solid var(--bd)}
+.r-foot div{flex:1}
+.r-foot .l{font-size:10px;color:var(--t3);letter-spacing:1.5px;font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+.r-foot .v{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700}
+.r-foot .v.p{color:var(--g)}
+.r-foot .v.c{color:#5BA8E0}
+.r-foot .v.f{color:var(--c)}
+
+/* SECTIONS */
+.section{max-width:1200px;margin:0 auto;padding:110px 36px}
+.section-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--g);letter-spacing:3px;margin-bottom:16px}
+.section-title{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1px;max-width:640px;line-height:1.25;margin-bottom:60px}
+
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--bd);border:1px solid var(--bd);border-radius:18px;overflow:hidden}
+.fcard{background:var(--s1);padding:36px 32px;transition:background .25s}
+.fcard:hover{background:var(--s2)}
+.fcard .ftag{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t3);letter-spacing:2px;margin-bottom:20px}
+.fcard h3{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;margin-bottom:12px;letter-spacing:-.3px}
+.fcard p{font-size:14px;color:var(--t2);line-height:1.7}
+
+/* PRICING */
+.pricing-wrap{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bd);border:1px solid var(--bd);border-radius:18px;overflow:hidden;max-width:780px;margin:0 auto}
+.pcard{background:var(--s1);padding:40px 36px;position:relative}
+.pcard.featured{background:var(--s2)}
+.pcard.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--g)}
+.ptag{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t2);letter-spacing:2px;margin-bottom:6px}
+.pcard.featured .ptag{color:var(--g)}
+.pname{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:18px}
+.pprice{font-family:'JetBrains Mono',monospace;font-size:46px;font-weight:700;letter-spacing:-1px}
+.pprice span{font-size:14px;font-weight:400;color:var(--t2)}
+.plist{list-style:none;margin:28px 0 32px;display:flex;flex-direction:column;gap:13px}
+.plist li{font-size:14px;color:var(--t1);display:flex;align-items:baseline;gap:10px}
+.plist li::before{content:'+';color:var(--g);font-weight:700;font-family:'JetBrains Mono',monospace}
+.pbtn{display:block;text-align:center;padding:14px;border-radius:9px;border:1px solid var(--bd);color:var(--t1);font-weight:500;font-family:'JetBrains Mono',monospace;text-decoration:none;transition:all .2s;font-size:13px;letter-spacing:.5px}
+.pcard.featured .pbtn{background:var(--g);color:#04342C;border-color:var(--g);font-weight:700}
+.pbtn:hover{border-color:var(--t2)}
+.pcard.featured .pbtn:hover{background:var(--gd)}
+
+/* CTA FINAL */
+.cta-final{max-width:1200px;margin:0 auto 80px;padding:80px 36px;text-align:center;background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--bd);border-radius:24px;position:relative;overflow:hidden}
+.cta-final::after{content:'';position:absolute;top:-100px;right:-100px;width:300px;height:300px;background:var(--gx);border-radius:50%;filter:blur(60px)}
+.cta-final h2{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;margin-bottom:14px;letter-spacing:-1px;position:relative}
+.cta-final p{color:var(--t2);font-size:15px;margin-bottom:32px;position:relative}
+
+footer{border-top:1px solid var(--bd);padding:36px;text-align:center;color:var(--t3);font-size:13px;font-family:'JetBrains Mono',monospace}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;padding-top:50px}
+  .hero h1{font-size:38px}
+  .features{grid-template-columns:1fr}
+  .pricing-wrap{grid-template-columns:1fr}
+  .navlinks{display:none}
+  .section{padding:70px 24px}
+  .section-title{font-size:28px}
+}
+
+/* LOGIN MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:999;align-items:center;justify-content:center}
+.modal-overlay.on{display:flex}
+.modal{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:32px;max-width:380px;width:90%;position:relative}
+.modal h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px}
+.modal p{font-size:13px;color:var(--t2);margin-bottom:20px}
+.modal input{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:11px 14px;color:var(--t1);font-size:14px;margin-bottom:12px;font-family:'DM Sans',sans-serif;outline:none}
+.modal input:focus{border-color:var(--g)}
+.modal-error{color:#EF4444;font-size:12px;margin-bottom:10px;display:none}
+.modal-close{position:absolute;top:14px;right:18px;color:var(--t2);cursor:pointer;font-size:20px;background:none;border:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#"><span class="dot"></span>Flowix</a>
+  <div class="navlinks">
+    <a href="#funciones">FUNCIONES</a>
+    <a href="#precios">PRECIOS</a>
+  </div>
+  <a class="btn-nav" href="#" onclick="document.getElementById('loginModal').classList.add('on');return false;">Acceder →</a>
+</nav>
+
+<div class="hero">
+  <div>
+    <div class="eyebrow">PARA ENTRENADORES ONLINE</div>
+    <h1>Tu metodologia,<br>generada en <span class="hl">segundos</span></h1>
+    <p>Flowix crea rutinas, dietas con macros exactos y seguimiento de clientes — siguiendo tu forma de entrenar, no una plantilla generica.</p>
+    <div class="hero-cta">
+      <a class="btn-primary" href="#" onclick="document.getElementById('loginModal').classList.add('on');return false;">Empezar gratis →</a>
+      <a class="btn-secondary" href="#funciones">Ver funciones</a>
+    </div>
+  </div>
+  <div class="readout">
+    <div class="readout-head">
+      <span class="name">PLAN_DIETA / DIA_01</span>
+      <div class="dots"><span></span><span></span><span></span></div>
+    </div>
+    <div class="readout-body">
+      <div class="r-row">
+        <div><div class="r-label">Desayuno</div><div class="r-sub">08:00 — avena, claras, platano</div></div>
+        <div class="r-val">490<span>kcal</span></div>
+      </div>
+      <div class="r-row">
+        <div><div class="r-label">Comida</div><div class="r-sub">14:00 — pollo, arroz, brocoli</div></div>
+        <div class="r-val">720<span>kcal</span></div>
+      </div>
+      <div class="r-row">
+        <div><div class="r-label">Cena</div><div class="r-sub">20:30 — salmon, patata, ensalada</div></div>
+        <div class="r-val">765<span>kcal</span></div>
+      </div>
+    </div>
+    <div class="r-foot">
+      <div><div class="l">PROTEINA</div><div class="v p">137g</div></div>
+      <div><div class="l">CARBOHIDRATOS</div><div class="v c">372g</div></div>
+      <div><div class="l">GRASAS</div><div class="v f">64g</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="funciones">
+  <div class="section-eyebrow">QUE HACE FLOWIX</div>
+  <div class="section-title">Tres herramientas, una sola plataforma para gestionar a tus clientes</div>
+  <div class="features">
+    <div class="fcard">
+      <div class="ftag">01 — ENTRENAMIENTO</div>
+      <h3>Rutinas a tu medida</h3>
+      <p>Genera planes de entrenamiento siguiendo tu propia metodologia, tus criterios de progresion y tu forma de programar — no una plantilla generica.</p>
+    </div>
+    <div class="fcard">
+      <div class="ftag">02 — NUTRICION</div>
+      <h3>Dietas con macros exactos</h3>
+      <p>Calcula calorias y macronutrientes de cada cliente y genera un plan de comidas detallado que cumple esos numeros, con lista de la compra incluida.</p>
+    </div>
+    <div class="fcard">
+      <div class="ftag">03 — SEGUIMIENTO</div>
+      <h3>Progreso centralizado</h3>
+      <p>Peso, fotos, medidas y notas de cada cliente en un solo lugar, sin hojas de calculo sueltas ni mensajes perdidos.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="precios">
+  <div class="section-eyebrow">PRECIOS</div>
+  <div class="section-title">Sin permanencia, cancela cuando quieras</div>
+  <div class="pricing-wrap">
+    <div class="pcard">
+      <div class="ptag">STARTER</div>
+      <div class="pname">Para empezar</div>
+      <div class="pprice">25€<span> /mes</span></div>
+      <ul class="plist">
+        <li>Hasta 5 clientes activos</li>
+        <li>Generador de rutinas</li>
+        <li>Calculadora y generador de dietas</li>
+        <li>Seguimiento basico</li>
+      </ul>
+      <a class="pbtn" href="#" onclick="document.getElementById('loginModal').classList.add('on');return false;">Empezar</a>
+    </div>
+    <div class="pcard featured">
+      <div class="ptag">PRO</div>
+      <div class="pname">Para escalar</div>
+      <div class="pprice">35€<span> /mes</span></div>
+      <ul class="plist">
+        <li>Clientes ilimitados</li>
+        <li>Todas las funciones de Starter</li>
+        <li>Automatizaciones avanzadas</li>
+        <li>Soporte directo</li>
+      </ul>
+      <a class="pbtn" href="#" onclick="document.getElementById('loginModal').classList.add('on');return false;">Empezar</a>
+    </div>
+  </div>
+</div>
+
+<div class="cta-final">
+  <h2>Empieza a usar Flowix con tus clientes</h2>
+  <p>Prueba gratuita, sin tarjeta.</p>
+  <a class="btn-primary" href="#" onclick="document.getElementById('loginModal').classList.add('on');return false;">Crear cuenta →</a>
+</div>
+
+<footer>
+  © 2026 FLOWIX
+</footer>
+
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('loginModal').classList.remove('on')">✕</button>
+    <h3>Flowix</h3>
+    <p>Accede a tu cuenta para continuar.</p>
+    <div class="modal-error" id="loginError">Usuario o contraseña incorrectos.</div>
+    <input type="text" id="loginUser" placeholder="Usuario">
+    <input type="password" id="loginPass" placeholder="Contraseña">
+    <button class="btn-primary" style="width:100%;border:none;cursor:pointer;justify-content:center" id="loginSubmit" onclick="doLogin()">Acceder a Flowix →</button>
+  </div>
+</div>
+
+<script>
+function doLogin(){
+  var u=document.getElementById('loginUser').value.trim();
+  var p=document.getElementById('loginPass').value;
+  var btn=document.getElementById('loginSubmit');
+  var err=document.getElementById('loginError');
+  err.style.display='none';
+  if(!u||!p){err.textContent='Rellena usuario y contraseña.';err.style.display='block';return;}
+  btn.textContent='Comprobando...';btn.disabled=true;
+
+  fetch('https://flowix-api.markel-zarragoitia47.workers.dev/',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({tipo:'login',usuario:u,password:p})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.ok){
+      var session={
+        usuario:data.usuario,
+        nombre:data.nombre,
+        plan:data.plan,
+        creditos_restantes:data.creditos_restantes
+      };
+      localStorage.setItem('flowix_session',JSON.stringify(session));
+      window.location.href='flowix_dashboard.html';
+    }else{
+      err.textContent=data.error||'Usuario o contraseña incorrectos.';
+      err.style.display='block';
+    }
+  })
+  .catch(function(e){
+    err.textContent='Error de conexion. Intentalo de nuevo.';
+    err.style.display='block';
+  })
+  .finally(function(){
+    btn.textContent='Acceder a Flowix →';btn.disabled=false;
+  });
+}
+document.getElementById('loginModal').addEventListener('click',function(e){
+  if(e.target===this)this.classList.remove('on');
+});
+document.getElementById('loginPass').addEventListener('keydown',function(e){
+  if(e.key==='Enter')doLogin();
+});
+</script>
+
+</body>
+</html>
