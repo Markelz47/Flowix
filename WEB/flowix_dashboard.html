@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowix — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --g:#00C896;--gd:#00B589;--gx:rgba(0,200,150,.10);
+  --r:#EF4444;--rx:rgba(239,68,68,.1);
+  --b:#0EA5E9;--bx:rgba(14,165,233,.1);
+  --o:#F59E0B;--ox:rgba(245,158,11,.1);
+  --bg:#05080B;--s1:#0C1520;--s2:#101C28;--s3:#172435;
+  --t1:#EDF2F8;--t2:#8098B2;--t3:#3F5A74;--bd:rgba(255,255,255,.06)
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--s3);border-radius:4px}
+
+/* LAYOUT */
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid var(--bd)}
+.sidebar-logo .logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--t1);letter-spacing:-.5px;display:flex;align-items:center;gap:8px;text-decoration:none}
+.sidebar-logo .dot{width:7px;height:7px;background:var(--g);border-radius:2px}
+.sidebar-logo .tagline{font-size:11px;color:var(--t3);margin-top:6px;font-family:'JetBrains Mono',monospace;letter-spacing:.5px}
+
+.sidebar-user{padding:16px 20px;border-bottom:1px solid var(--bd)}
+.user-row{display:flex;align-items:center;gap:12px}
+.user-avatar{width:36px;height:36px;border-radius:10px;background:var(--gx);border:1.5px solid var(--g);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--g);flex-shrink:0}
+.user-name{font-size:14px;font-weight:600;color:var(--t1)}
+.user-plan{font-size:11px;color:var(--t2);font-family:'JetBrains Mono',monospace;letter-spacing:.5px;margin-top:2px}
+.credits-bar{margin-top:12px;background:var(--s2);border-radius:20px;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
+.credits-label{font-size:11px;color:var(--t2)}
+.credits-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--g)}
+
+.sidebar-nav{padding:16px 12px;flex:1}
+.nav-section{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:2px;padding:0 12px;margin-bottom:8px;margin-top:16px}
+.nav-section:first-child{margin-top:0}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;color:var(--t2);cursor:pointer;transition:all .2s;margin-bottom:2px;font-size:14px;font-weight:500;border:none;background:transparent;width:100%;text-align:left;text-decoration:none}
+.nav-item:hover{background:var(--s2);color:var(--t1)}
+.nav-item.active{background:var(--gx);color:var(--g);font-weight:600}
+.nav-item .icon{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+
+.sidebar-bottom{padding:16px 12px;border-top:1px solid var(--bd)}
+.btn-salir{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;color:var(--t3);cursor:pointer;font-size:13px;border:none;background:transparent;width:100%;transition:all .2s}
+.btn-salir:hover{color:var(--r);background:var(--rx)}
+
+/* MAIN */
+.main{padding:36px;overflow-y:auto}
+.page-header{margin-bottom:32px}
+.page-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.5px}
+.page-sub{font-size:14px;color:var(--t2);margin-top:6px}
+
+/* SECTIONS */
+.section{display:none}
+.section.active{display:block}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:24px;margin-bottom:20px}
+.card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:2px;margin-bottom:18px}
+
+/* HOME */
+.home-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px}
+.home-card{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:24px;cursor:pointer;transition:all .25s;text-decoration:none;display:block}
+.home-card:hover{border-color:rgba(0,200,150,.3);transform:translateY(-2px);background:var(--s2)}
+.home-card .hc-icon{font-size:32px;margin-bottom:14px}
+.home-card .hc-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:6px}
+.home-card .hc-desc{font-size:13px;color:var(--t2);line-height:1.5}
+.home-card .hc-arrow{font-size:13px;color:var(--g);margin-top:14px;font-family:'JetBrains Mono',monospace}
+
+.welcome-card{background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--bd);border-radius:16px;padding:28px;margin-bottom:24px;position:relative;overflow:hidden}
+.welcome-card::after{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:var(--gx);border-radius:50%;filter:blur(40px)}
+.welcome-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px}
+.welcome-sub{font-size:14px;color:var(--t2);line-height:1.6}
+
+/* BUTTONS */
+.btn{padding:12px 22px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s;font-family:'DM Sans',sans-serif}
+.btn-green{background:var(--g);color:#04342C}
+.btn-green:hover{background:var(--gd)}
+.btn-outline{background:transparent;border:1px solid var(--bd);color:var(--t1)}
+.btn-outline:hover{border-color:var(--t2)}
+
+/* FORMS */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+label{font-size:11px;color:var(--t2);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+input,select,textarea{background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:11px 14px;color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;width:100%;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--g)}
+input::placeholder,textarea::placeholder{color:var(--t3)}
+select option{background:var(--s2)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+/* PROGRESS SECTION */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.stat-box{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:18px;text-align:center}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:var(--t1)}
+.stat-lbl{font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.stat-diff{font-size:12px;margin-top:4px;font-weight:600}
+.stat-diff.up{color:var(--r)}
+.stat-diff.down{color:var(--g)}
+
+.weight-entry{display:flex;gap:12px;align-items:flex-end;margin-bottom:16px}
+.weight-entry .field{margin-bottom:0;flex:1}
+
+.log-list{display:flex;flex-direction:column;gap:10px}
+.log-item{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.log-item .li-date{font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.log-item .li-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--t1)}
+.log-item .li-diff{font-size:12px;font-weight:600;margin-top:2px}
+.li-diff.up{color:var(--r)}
+.li-diff.down{color:var(--g)}
+.log-item .li-delete{color:var(--t3);cursor:pointer;font-size:16px;background:none;border:none;padding:4px;transition:color .2s}
+.log-item .li-delete:hover{color:var(--r)}
+
+/* PHOTO GRID */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.photo-slot{aspect-ratio:1;border-radius:12px;background:var(--s2);border:1.5px dashed var(--bd);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.photo-slot:hover{border-color:var(--g)}
+.photo-slot img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.photo-slot .ps-icon{font-size:24px;color:var(--t3)}
+.photo-slot .ps-label{font-size:11px;color:var(--t3);margin-top:6px;text-align:center}
+.photo-slot input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+/* DIARY */
+.diary-list{display:flex;flex-direction:column;gap:10px}
+.diary-item{background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:16px}
+.diary-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.diary-date{font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.diary-type{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.diary-type.entreno{background:var(--gx);color:var(--g)}
+.diary-type.dieta{background:var(--bx);color:var(--b)}
+.diary-text{font-size:13px;color:var(--t2);line-height:1.6}
+.diary-rating{font-size:18px;margin-top:8px}
+.btn-delete{color:var(--t3);cursor:pointer;font-size:14px;background:none;border:none;transition:color .2s}
+.btn-delete:hover{color:var(--r)}
+
+/* TABS */
+.tabs{display:flex;gap:4px;background:var(--s2);border-radius:10px;padding:4px;margin-bottom:20px}
+.tab{flex:1;padding:9px;border-radius:8px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--t2);border:none;background:transparent;transition:all .2s}
+.tab.active{background:var(--s1);color:var(--t1)}
+
+/* MOBILE */
+.mobile-nav{display:none}
+@media(max-width:768px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .main{padding:20px 16px 100px}
+  .home-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--bd);padding:8px 0;z-index:100;justify-content:space-around}
+  .mn-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 16px;cursor:pointer;color:var(--t3);border:none;background:transparent;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;transition:color .2s}
+  .mn-item.active{color:var(--g)}
+  .mn-item .mn-icon{font-size:22px}
+}
+
+/* CHART */
+.chart-wrap{position:relative;height:200px;margin-top:16px}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:48px 24px;color:var(--t2)}
+.empty .e-icon{font-size:40px;margin-bottom:12px}
+.empty .e-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.empty .e-sub{font-size:13px;line-height:1.6}
+
+.badge-plan{display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+.badge-plan.pro{background:var(--gx);color:var(--g);border:1px solid rgba(0,200,150,.3)}
+.badge-plan.basica{background:var(--bx);color:var(--b);border:1px solid rgba(14,165,233,.3)}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <a class="logo" href="#"><span class="dot"></span>Flowix</a>
+      <div class="tagline">COME BIEN · ENTRENA BIEN</div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-row">
+        <div class="user-avatar" id="userAvatar">M</div>
+        <div>
+          <div class="user-name" id="userName">—</div>
+          <div class="user-plan"><span class="badge-plan" id="userPlanBadge">—</span></div>
+        </div>
+      </div>
+      <div class="credits-bar" id="creditsBar">
+        <span class="credits-label">Generaciones este mes</span>
+        <span class="credits-val" id="creditsVal">—</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">Principal</div>
+      <button class="nav-item active" onclick="goTo('home',this)"><span class="icon">🏠</span>Inicio</button>
+
+      <div class="nav-section">Herramientas</div>
+      <button class="nav-item" onclick="goTo('rutinas',this)"><span class="icon">🏋️</span>Mis rutinas</button>
+      <button class="nav-item" onclick="goTo('nutricion',this)"><span class="icon">🥗</span>Mi nutrición</button>
+
+      <div class="nav-section">Seguimiento</div>
+      <button class="nav-item" onclick="goTo('progreso',this)"><span class="icon">📊</span>Mi progreso</button>
+      <button class="nav-item" onclick="goTo('diario',this)"><span class="icon">📓</span>Mi diario</button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <button class="btn-salir" onclick="salir()">← Cerrar sesión</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- HOME -->
+    <div class="section active" id="sec-home">
+      <div class="welcome-card">
+        <div class="welcome-title">Bienvenido, <span id="welcomeName" style="color:var(--g)">—</span> 👋</div>
+        <div class="welcome-sub">Come bien. Entrena bien. Vive bonito.<br>Tu rutina, tu dieta y tu progreso — en un solo lugar, sin depender de nadie.</div>
+      </div>
+      <div class="home-grid">
+        <a class="home-card" onclick="goTo('rutinas',null);return false;" href="#">
+          <div class="hc-icon">🏋️</div>
+          <div class="hc-title">Mis rutinas</div>
+          <div class="hc-desc">Genera un plan de entrenamiento personalizado con tu metodología y objetivos.</div>
+          <div class="hc-arrow">Generar rutina →</div>
+        </a>
+        <a class="home-card" onclick="goTo('nutricion',null);return false;" href="#">
+          <div class="hc-icon">🥗</div>
+          <div class="hc-title">Mi nutrición</div>
+          <div class="hc-desc">Calcula tus calorías y macros, y genera un plan de dieta con ingredientes exactos.</div>
+          <div class="hc-arrow">Calcular macros →</div>
+        </a>
+        <a class="home-card" onclick="goTo('progreso',null);return false;" href="#">
+          <div class="hc-icon">📊</div>
+          <div class="hc-title">Mi progreso</div>
+          <div class="hc-desc">Registra tu peso, sube fotos y visualiza tu evolución con una gráfica clara.</div>
+          <div class="hc-arrow">Ver progreso →</div>
+        </a>
+        <a class="home-card" onclick="goTo('diario',null);return false;" href="#">
+          <div class="hc-icon">📓</div>
+          <div class="hc-title">Mi diario</div>
+          <div class="hc-desc">Anota cómo te has sentido en tus entrenamientos y con tu dieta cada día.</div>
+          <div class="hc-arrow">Abrir diario →</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- RUTINAS -->
+    <div class="section" id="sec-rutinas">
+      <div class="page-header">
+        <div class="page-title">Mis rutinas 🏋️</div>
+        <div class="page-sub">Genera tu plan de entrenamiento personalizado</div>
+      </div>
+      <div class="card">
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:48px;margin-bottom:16px">🏋️</div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px">Generador de rutinas</div>
+          <div style="font-size:14px;color:var(--t2);margin-bottom:24px">El generador completo está en la herramienta dedicada</div>
+          <a class="btn btn-green" href="flowix_generador.html" style="text-decoration:none;display:inline-block">Abrir generador de rutinas →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- NUTRICION -->
+    <div class="section" id="sec-nutricion">
+      <div class="page-header">
+        <div class="page-title">Mi nutrición 🥗</div>
+        <div class="page-sub">Calcula tus macros y genera tu plan de dieta</div>
+      </div>
+      <div class="card">
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:48px;margin-bottom:16px">🥗</div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px">Calculadora y generador de dietas</div>
+          <div style="font-size:14px;color:var(--t2);margin-bottom:24px">Calcula tus calorías, macros y genera tu plan completo con lista de la compra</div>
+          <a class="btn btn-green" href="flowix_calorias.html" style="text-decoration:none;display:inline-block">Abrir calculadora de nutrición →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRESO -->
+    <div class="section" id="sec-progreso">
+      <div class="page-header">
+        <div class="page-title">Mi progreso 📊</div>
+        <div class="page-sub">Registra tu peso y visualiza tu evolución</div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-val" id="pesoActual">—</div>
+          <div class="stat-lbl">Peso actual (kg)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="pesoInicial">—</div>
+          <div class="stat-lbl">Peso inicial (kg)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="pesoDiff">—</div>
+          <div class="stat-lbl">Variación total</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Registrar peso</div>
+        <div class="weight-entry">
+          <div class="field">
+            <label>Fecha</label>
+            <input type="date" id="pesoFecha">
+          </div>
+          <div class="field">
+            <label>Peso (kg)</label>
+            <input type="number" id="pesoVal" placeholder="75.5" step="0.1">
+          </div>
+          <div class="field">
+            <label>Nota (opcional)</label>
+            <input type="text" id="pesoNota" placeholder="Mañana en ayunas...">
+          </div>
+          <button class="btn btn-green" onclick="addPeso()" style="flex-shrink:0;white-space:nowrap">+ Añadir</button>
+        </div>
+        <div class="chart-wrap"><canvas id="pesoChart"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Historial de pesos</div>
+        <div class="log-list" id="pesoList">
+          <div class="empty"><div class="e-icon">⚖️</div><div class="e-title">Sin registros aún</div><div class="e-sub">Añade tu primer peso para empezar a ver tu evolución.</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Fotos de progreso</div>
+        <div style="font-size:13px;color:var(--t2);margin-bottom:4px">Sube fotos para visualizar tu transformación. Se guardan solo en este dispositivo.</div>
+        <div class="photo-grid" id="photoGrid">
+          <div class="photo-slot" id="slot-front">
+            <input type="file" accept="image/*" onchange="loadPhoto(this,'slot-front')">
+            <div class="ps-icon">📷</div>
+            <div class="ps-label">Frontal</div>
+          </div>
+          <div class="photo-slot" id="slot-side">
+            <input type="file" accept="image/*" onchange="loadPhoto(this,'slot-side')">
+            <div class="ps-icon">📷</div>
+            <div class="ps-label">Lateral</div>
+          </div>
+          <div class="photo-slot" id="slot-back">
+            <input type="file" accept="image/*" onchange="loadPhoto(this,'slot-back')">
+            <div class="ps-icon">📷</div>
+            <div class="ps-label">Espalda</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIARIO -->
+    <div class="section" id="sec-diario">
+      <div class="page-header">
+        <div class="page-title">Mi diario 📓</div>
+        <div class="page-sub">Registra cómo te has sentido cada día</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Nueva entrada</div>
+        <div class="g2" style="margin-bottom:14px">
+          <div class="field">
+            <label>Fecha</label>
+            <input type="date" id="diarioFecha">
+          </div>
+          <div class="field">
+            <label>Tipo</label>
+            <select id="diarioTipo">
+              <option value="entreno">Entrenamiento</option>
+              <option value="dieta">Dieta</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>¿Cómo te has sentido?</label>
+          <textarea id="diarioTexto" placeholder="Hoy he entrenado pierna, la sesión ha ido bien aunque me notaba cansado..." style="min-height:90px;resize:vertical"></textarea>
+        </div>
+        <div class="field">
+          <label>Valoración</label>
+          <div style="display:flex;gap:10px;margin-top:4px">
+            <button class="btn btn-outline" onclick="setRating(this,'😴')" data-r="😴" style="font-size:22px;padding:8px 16px">😴</button>
+            <button class="btn btn-outline" onclick="setRating(this,'😕')" data-r="😕" style="font-size:22px;padding:8px 16px">😕</button>
+            <button class="btn btn-outline" onclick="setRating(this,'😐')" data-r="😐" style="font-size:22px;padding:8px 16px">😐</button>
+            <button class="btn btn-outline" onclick="setRating(this,'💪')" data-r="💪" style="font-size:22px;padding:8px 16px">💪</button>
+            <button class="btn btn-outline" onclick="setRating(this,'🔥')" data-r="🔥" style="font-size:22px;padding:8px 16px">🔥</button>
+          </div>
+        </div>
+        <button class="btn btn-green" style="margin-top:8px" onclick="addDiario()">Guardar entrada</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Entradas recientes</div>
+        <div class="tabs">
+          <button class="tab active" onclick="filterDiario('all',this)">Todo</button>
+          <button class="tab" onclick="filterDiario('entreno',this)">Entrenos</button>
+          <button class="tab" onclick="filterDiario('dieta',this)">Dieta</button>
+        </div>
+        <div class="diary-list" id="diarioList">
+          <div class="empty"><div class="e-icon">📓</div><div class="e-title">Sin entradas aún</div><div class="e-sub">Empieza a registrar cómo te sientes cada día.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MOBILE NAV -->
+<nav class="mobile-nav">
+  <button class="mn-item active" onclick="goTo('home',this)" data-sec="home"><span class="mn-icon">🏠</span>Inicio</button>
+  <button class="mn-item" onclick="goTo('rutinas',this)" data-sec="rutinas"><span class="mn-icon">🏋️</span>Rutinas</button>
+  <button class="mn-item" onclick="goTo('nutricion',this)" data-sec="nutricion"><span class="mn-icon">🥗</span>Nutrición</button>
+  <button class="mn-item" onclick="goTo('progreso',this)" data-sec="progreso"><span class="mn-icon">📊</span>Progreso</button>
+  <button class="mn-item" onclick="goTo('diario',this)" data-sec="diario"><span class="mn-icon">📓</span>Diario</button>
+</nav>
+
+<script>
+// SESSION
+function getSession(){try{return JSON.parse(localStorage.getItem('flowix_session'))||null;}catch(e){return null;}}
+function initSession(){
+  var s=getSession();
+  if(!s){window.location.href='index.html';return;}
+  document.getElementById('welcomeName').textContent=s.nombre||s.usuario;
+  document.getElementById('userName').textContent=s.nombre||s.usuario;
+  document.getElementById('userAvatar').textContent=(s.nombre||s.usuario||'U')[0].toUpperCase();
+  var badge=document.getElementById('userPlanBadge');
+  badge.textContent=s.plan==='pro'?'PRO':'BÁSICA';
+  badge.className='badge-plan '+(s.plan==='pro'?'pro':'basica');
+  var credBar=document.getElementById('creditsBar');
+  var credVal=document.getElementById('creditsVal');
+  if(s.plan==='pro'){credVal.textContent='Ilimitadas';credVal.style.color='var(--g)';}
+  else{credVal.textContent=s.creditos_restantes+' restantes';}
+}
+function salir(){localStorage.removeItem('flowix_session');window.location.href='index.html';}
+
+// NAVIGATION
+function goTo(sec, el){
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
+  document.getElementById('sec-'+sec).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+  document.querySelectorAll('.mn-item').forEach(function(n){n.classList.remove('active');});
+  if(el){el.classList.add('active');}
+  // sync mobile nav
+  document.querySelectorAll('.mn-item').forEach(function(n){if(n.dataset.sec===sec)n.classList.add('active');});
+  document.querySelectorAll('.nav-item').forEach(function(n){if(n.textContent.toLowerCase().indexOf(sec.substring(0,4))>=0)n.classList.add('active');});
+}
+
+// PESO DATA
+var pesosData=[];
+var pesoChart=null;
+function loadPesos(){
+  try{pesosData=JSON.parse(localStorage.getItem('flowix_pesos'))||[];}catch(e){pesosData=[];}
+  renderPesos();
+}
+function savePesos(){localStorage.setItem('flowix_pesos',JSON.stringify(pesosData));}
+function addPeso(){
+  var fecha=document.getElementById('pesoFecha').value;
+  var val=parseFloat(document.getElementById('pesoVal').value);
+  var nota=document.getElementById('pesoNota').value;
+  if(!fecha||!val){alert('Rellena fecha y peso.');return;}
+  pesosData.push({fecha:fecha,val:val,nota:nota});
+  pesosData.sort(function(a,b){return a.fecha.localeCompare(b.fecha);});
+  savePesos();
+  document.getElementById('pesoVal').value='';
+  document.getElementById('pesoNota').value='';
+  renderPesos();
+}
+function deletePeso(idx){
+  pesosData.splice(idx,1);
+  savePesos();
+  renderPesos();
+}
+function renderPesos(){
+  // Stats
+  if(pesosData.length>0){
+    var last=pesosData[pesosData.length-1].val;
+    var first=pesosData[0].val;
+    var diff=last-first;
+    document.getElementById('pesoActual').textContent=last.toFixed(1)+' kg';
+    document.getElementById('pesoInicial').textContent=first.toFixed(1)+' kg';
+    var diffEl=document.getElementById('pesoDiff');
+    diffEl.textContent=(diff>0?'+':'')+diff.toFixed(1)+' kg';
+    diffEl.style.color=diff>0?'var(--r)':'var(--g)';
+  }else{
+    document.getElementById('pesoActual').textContent='—';
+    document.getElementById('pesoInicial').textContent='—';
+    document.getElementById('pesoDiff').textContent='—';
+  }
+  // Chart
+  if(pesoChart)pesoChart.destroy();
+  var ctx=document.getElementById('pesoChart').getContext('2d');
+  pesoChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:pesosData.map(function(p){return p.fecha.slice(5);}),
+      datasets:[{
+        data:pesosData.map(function(p){return p.val;}),
+        borderColor:'#00C896',
+        backgroundColor:'rgba(0,200,150,.08)',
+        fill:true,
+        tension:.4,
+        pointBackgroundColor:'#00C896',
+        pointRadius:4
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#7A94AE',font:{size:11}}},
+        y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#7A94AE',font:{size:11}},beginAtZero:false}
+      }
+    }
+  });
+  // List
+  var list=document.getElementById('pesoList');
+  if(pesosData.length===0){
+    list.innerHTML='<div class="empty"><div class="e-icon">⚖️</div><div class="e-title">Sin registros aún</div><div class="e-sub">Añade tu primer peso para empezar a ver tu evolución.</div></div>';
+    return;
+  }
+  var html='';
+  var reversed=pesosData.slice().reverse();
+  reversed.forEach(function(p,i){
+    var realIdx=pesosData.length-1-i;
+    var prev=realIdx>0?pesosData[realIdx-1].val:null;
+    var diff=prev!==null?p.val-prev:null;
+    var diffHtml=diff!==null?'<div class="li-diff '+(diff>0?'up':'down')+'">'+(diff>0?'+':'')+diff.toFixed(1)+' kg</div>':'';
+    html+='<div class="log-item"><div><div class="li-date">'+p.fecha+'</div>'+(p.nota?'<div style="font-size:12px;color:var(--t2);margin-top:2px">'+p.nota+'</div>':'')+'</div><div style="text-align:right"><div class="li-val">'+p.val.toFixed(1)+'</div>'+diffHtml+'</div><button class="li-delete" onclick="deletePeso('+realIdx+')">✕</button></div>';
+  });
+  list.innerHTML=html;
+}
+function loadPhoto(input,slotId){
+  var file=input.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var slot=document.getElementById(slotId);
+    var existing=slot.querySelector('img');
+    if(existing)existing.remove();
+    var img=document.createElement('img');
+    img.src=e.target.result;
+    slot.appendChild(img);
+    var label=slot.querySelector('.ps-label');
+    if(label)label.style.display='none';
+    var icon=slot.querySelector('.ps-icon');
+    if(icon)icon.style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+// DIARIO
+var diarioData=[];
+var currentRating='';
+var diarioFilter='all';
+function loadDiario(){
+  try{diarioData=JSON.parse(localStorage.getItem('flowix_diario'))||[];}catch(e){diarioData=[];}
+  renderDiario();
+}
+function saveDiario(){localStorage.setItem('flowix_diario',JSON.stringify(diarioData));}
+function setRating(btn,r){
+  currentRating=r;
+  document.querySelectorAll('[data-r]').forEach(function(b){b.style.opacity='.4';});
+  btn.style.opacity='1';
+}
+function addDiario(){
+  var fecha=document.getElementById('diarioFecha').value;
+  var tipo=document.getElementById('diarioTipo').value;
+  var texto=document.getElementById('diarioTexto').value.trim();
+  if(!fecha||!texto){alert('Rellena la fecha y el texto.');return;}
+  diarioData.unshift({fecha:fecha,tipo:tipo,texto:texto,rating:currentRating});
+  saveDiario();
+  document.getElementById('diarioTexto').value='';
+  currentRating='';
+  document.querySelectorAll('[data-r]').forEach(function(b){b.style.opacity='1';});
+  renderDiario();
+}
+function deleteDiario(idx){
+  diarioData.splice(idx,1);
+  saveDiario();
+  renderDiario();
+}
+function filterDiario(f,tab){
+  diarioFilter=f;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  if(tab)tab.classList.add('active');
+  renderDiario();
+}
+function renderDiario(){
+  var list=document.getElementById('diarioList');
+  var filtered=diarioFilter==='all'?diarioData:diarioData.filter(function(d){return d.tipo===diarioFilter;});
+  if(filtered.length===0){
+    list.innerHTML='<div class="empty"><div class="e-icon">📓</div><div class="e-title">Sin entradas aún</div><div class="e-sub">Empieza a registrar cómo te sientes cada día.</div></div>';
+    return;
+  }
+  var html='';
+  filtered.forEach(function(d,i){
+    var realIdx=diarioData.indexOf(d);
+    html+='<div class="diary-item"><div class="diary-header"><div style="display:flex;align-items:center;gap:10px"><span class="diary-date">'+d.fecha+'</span><span class="diary-type '+d.tipo+'">'+(d.tipo==='entreno'?'Entrenamiento':'Dieta')+'</span></div><button class="btn-delete" onclick="deleteDiario('+realIdx+')">✕</button></div><div class="diary-text">'+d.texto+'</div>'+(d.rating?'<div class="diary-rating">'+d.rating+'</div>':'')+'</div>';
+  });
+  list.innerHTML=html;
+}
+
+// INIT
+(function(){
+  initSession();
+  // Set today's date on date inputs
+  var hoy=new Date().toISOString().slice(0,10);
+  document.getElementById('pesoFecha').value=hoy;
+  document.getElementById('diarioFecha').value=hoy;
+  loadPesos();
+  loadDiario();
+})();
+</script>
+</body>
+</html>
